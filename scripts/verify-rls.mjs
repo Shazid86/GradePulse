@@ -38,14 +38,14 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const signUp = async (tag) => {
   const client = createClient(url, anon);
   const email = `gp-qa-${tag}-${Date.now()}@gradepulse.dev`;
-  for (let attempt = 1; attempt <= 7; attempt++) {
+  for (let attempt = 1; attempt <= 40; attempt++) {
     const { data, error } = await client.auth.signUp({
       email,
       password: `Qa!${randomUUID()}`,
     });
     if (!error) return { client, session: data.session };
-    if (attempt === 7) throw new Error(`signUp(${tag}): ${error.message}`);
-    console.log(`INFO  signUp throttled (${error.message}) — wait 90s, retry ${attempt}/7`);
+    if (attempt === 40) throw new Error(`signUp(${tag}): ${error.message}`);
+    console.log(`INFO  signUp throttled (${error.message}) — wait 90s, retry ${attempt}/40`);
     await sleep(90000);
   }
 };
