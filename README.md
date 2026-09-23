@@ -45,37 +45,52 @@ GradePulse transforms raw academic records — class tests, quizzes, assignments
 
 ## Scripts
 
-| Command             | Purpose                        |
-| ------------------- | ------------------------------ |
-| `npm run dev`       | Development server             |
-| `npm run build`     | Production build               |
-| `npm run start`     | Start production server        |
-| `npm run lint`      | ESLint                         |
-| `npm run typecheck` | TypeScript type checking       |
+| Command               | Purpose                                  |
+| --------------------- | ---------------------------------------- |
+| `npm run dev`         | Development server                       |
+| `npm run build`       | Production build                         |
+| `npm run start`       | Start production server                  |
+| `npm run lint`        | ESLint                                   |
+| `npm run typecheck`   | TypeScript type checking                 |
+| `npm test`            | Unit tests for the calculation engine    |
+| `npm run verify:rls`  | Live persistence + RLS checks (real DB)  |
 
 ## Project structure
 
 ```
 src/
-  app/                  Routes: (auth) login/signup, (app) dashboard, auth/callback
+  app/                  Routes: (auth) login/signup, (app) dashboard/semesters/courses, auth/callback
+  calculations/         Pure calculation engine + unit tests (no UI, no DB)
   components/
     auth/               Login/signup forms
+    courses/            Course dialogs
     layout/             Shell: sidebar, topbar, nav, theme
+    semesters/          Semester dialogs + course list section
+    shared/             Cross-feature UI (confirm dialog)
+    structure/          Category/assessment dialogs + cards
     ui/                 shadcn/ui primitives
-  features/             Feature logic (auth actions, …)
+  features/             Server actions + zod validations + queries per entity
   lib/
     supabase/           Client/server/proxy session layer + env guard
     utils.ts
-  validations/          Zod schemas
+  validations/          Shared validation primitives
   types/                Database row types
   proxy.ts              Session refresh + route protection (Next.js 16)
+scripts/
+  verify-rls.mjs        Live RLS + persistence verification (throwaway QA users)
 supabase/migrations/    Versioned SQL migrations
 ```
 
+## Typography
+
+Manrope (primary UI typeface — refined geometric sans) paired with Geist Mono
+for tabular marks/figures, loaded via `next/font`.
+
 ## Project status
 
-- ✅ **Phase 1 — Foundation**: project scaffold, Supabase integration, auth, schema, RLS, app shell, navigation, theme
-- ⬜ Phase 2+ — academic structure, dashboard, analytics, target engine, GPA/CGPA, calendar, polish
+- ✅ **Phase 1 — Foundation**: scaffold, Supabase integration, auth, schema, RLS, app shell, navigation, theme
+- ✅ **Phase 2 — Academic structure**: semester/course/category/assessment CRUD, validation, pure calculation engine (37 unit tests)
+- ⬜ Phase 3+ — dashboard, analytics, target engine, GPA/CGPA, calendar, polish
 
 ## Security
 

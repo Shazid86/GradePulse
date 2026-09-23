@@ -1,3 +1,4 @@
+import Link from "next/link";
 import {
   Card,
   CardContent,
@@ -6,6 +7,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { BrandMark } from "@/components/layout/brand";
 
 const ONBOARDING_STEPS = [
@@ -49,6 +51,9 @@ export default function DashboardPage() {
               </li>
             ))}
           </ol>
+          <Button asChild className="mt-6 w-full sm:w-auto">
+            <Link href="/semesters">Go to Semesters</Link>
+          </Button>
         </CardContent>
       </Card>
     </div>
