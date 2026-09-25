@@ -2,6 +2,7 @@ import Link from "next/link";
 import { formatMarks, formatPercent } from "@/lib/format";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { StatusBadge } from "@/components/analytics/status-badge";
 import type { CourseCard as CourseCardData } from "@/features/dashboard/queries";
 
 /** Course card for dashboard/semester overview (spec §22/§23). */
@@ -45,6 +46,8 @@ export function CourseCard({ course }: { course: CourseCardData }) {
             Remaining {formatMarks(score.remainingMarks)} · Max possible{" "}
             {formatMarks(score.maxPossibleScore)}
           </p>
+
+          <StatusBadge status={course.status} className="w-fit" />
         </CardContent>
       </Card>
     </Link>

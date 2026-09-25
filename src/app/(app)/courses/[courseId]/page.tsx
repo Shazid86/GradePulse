@@ -6,10 +6,16 @@ import { deleteCourse } from "@/features/courses/actions";
 import { getCourse } from "@/features/courses/queries";
 import { listCategories } from "@/features/categories/queries";
 import { listAssessments } from "@/features/assessments/queries";
-import { buildCourseScore } from "@/features/scores/assembly";
+import { buildCourseAnalytics } from "@/features/scores/analytics";
+import { getCourseTarget } from "@/features/targets/queries";
 import { CourseFormDialog } from "@/components/courses/course-form-dialog";
 import { CourseSummary } from "@/components/courses/course-summary";
 import { CategoryBreakdown } from "@/components/courses/category-breakdown";
+import { ChartCard } from "@/components/analytics/chart-card";
+import { PerformanceTrendChart } from "@/components/analytics/performance-trend-chart";
+import { CategoryComparisonChart } from "@/components/analytics/category-comparison-chart";
+import { AssessmentProgressionChart } from "@/components/analytics/assessment-progression-chart";
+import { TargetProgress } from "@/components/analytics/target-progress";
 import { StructureCard } from "@/components/structure/structure-card";
 import { AssessmentsCard } from "@/components/structure/assessments-card";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
@@ -24,10 +30,11 @@ export default async function CourseDetailPage({
   params: Promise<{ courseId: string }>;
 }) {
   const { courseId } = await params;
-  const [course, categories, assessments] = await Promise.all([
+  const [course, categories, assessments, target] = await Promise.all([
     getCourse(courseId),
     listCategories(courseId),
     listAssessments(courseId),
+    getCourseTarget(courseId),
   ]);
   if (!course) notFound();
 
@@ -38,7 +45,8 @@ export default async function CourseDetailPage({
       (assessmentCountByCategory.get(assessment.category_id) ?? 0) + 1
     );
   }
-  const score = buildCourseScore(course, categories, assessments);
+  const analytics = buildCourseAnalytics(course, categories, assessments);
+  const { score } = analytics;
 
   return (
     <div className="mx-auto w-full max-w-4xl space-y-6">
@@ -97,7 +105,48 @@ export default async function CourseDetailPage({
         </div>
       </header>
 
-      <CourseSummary score={score} />
+      <CourseSummary
+        score={score}
+        status={analytics.status}
+        trend={analytics.trend}
+      />
+
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+        <ChartCard
+          title="Performance over time"
+          description="Each dated, graded assessment"
+          isEmpty={analytics.series.length < 2}
+          emptyMessage="Record at least two dated assessments to see your performance over time."
+        >
+          <PerformanceTrendChart points={analytics.series} />
+        </ChartCard>
+
+        <ChartCard
+          title="Category comparison"
+          description="Graded categories, percentage of marks earned"
+          isEmpty={!analytics.score.categories.some((c) => c.percentage !== null)}
+          emptyMessage="Grade assessments to compare your categories."
+        >
+          <CategoryComparisonChart categories={analytics.score.categories} />
+        </ChartCard>
+      </div>
+
+      <ChartCard
+        title="Assessment progression"
+        description="Cumulative secured marks over time"
+        isEmpty={analytics.progression.length < 1}
+        emptyMessage="Dated, graded assessments will build your progression curve."
+      >
+        <AssessmentProgressionChart
+          points={analytics.progression}
+          totalMarks={score.totalMarks}
+        />
+      </ChartCard>
+
+      <TargetProgress
+        target={target}
+        securedPercentage={score.percentage}
+      />
 
       <CategoryBreakdown categories={score.categories} />
 

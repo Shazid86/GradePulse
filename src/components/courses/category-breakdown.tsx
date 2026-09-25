@@ -23,46 +23,38 @@ export function CategoryBreakdown({
           Performance per category of your assessment structure
         </p>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-3">
         {categories.map((category) => {
           const pct = category.percentage;
           return (
-            <div key={category.categoryId} className="space-y-1.5">
-              <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5 text-sm">
-                <span className="font-medium">{category.name}</span>
-                <span className="tabular-nums">
-                  <span
-                    className={
-                      pct === null
-                        ? "text-muted-foreground"
-                        : "font-medium text-primary"
-                    }
-                  >
-                    {pct === null ? "Not graded" : formatPercent(pct)}
-                  </span>
-                  <span className="text-muted-foreground">
-                    {" "}
-                    · {formatMarks(category.securedMarks)}/
-                    {formatMarks(category.weight)}
-                  </span>
+            <div
+              key={category.categoryId}
+              className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 rounded-lg border border-border/60 bg-background/40 px-3 py-2"
+            >
+              <div className="min-w-0">
+                <p className="text-sm font-medium">{category.name}</p>
+                <p className="text-xs text-muted-foreground">
+                  {category.completedCount} of {category.definedCount} completed
+                  {category.pendingCount > 0
+                    ? ` · ${category.pendingCount} pending`
+                    : ""}
+                </p>
+              </div>
+              <p className="shrink-0 text-sm tabular-nums">
+                <span
+                  className={
+                    pct === null
+                      ? "text-muted-foreground"
+                      : "font-medium text-primary"
+                  }
+                >
+                  {pct === null ? "Not graded" : formatPercent(pct)}
                 </span>
-              </div>
-              <div
-                className="h-1.5 overflow-hidden rounded-full bg-muted"
-                role="presentation"
-              >
-                <div
-                  className="h-full rounded-full bg-primary transition-all"
-                  style={{
-                    width: `${pct === null ? 0 : Math.min(100, Math.max(0, pct))}%`,
-                  }}
-                />
-              </div>
-              <p className="text-xs text-muted-foreground">
-                {category.completedCount} of {category.definedCount} completed
-                {category.pendingCount > 0
-                  ? ` · ${category.pendingCount} pending`
-                  : ""}
+                <span className="text-muted-foreground">
+                  {" "}
+                  · {formatMarks(category.securedMarks)}/
+                  {formatMarks(category.weight)}
+                </span>
               </p>
             </div>
           );

@@ -3,12 +3,8 @@ import { getSemester, type SemesterDetail } from "@/features/semesters/queries";
 import { listCategoriesForCourses } from "@/features/categories/queries";
 import { listAssessmentsForCourses } from "@/features/assessments/queries";
 import { buildCourseScore } from "@/features/scores/assembly";
-import {
-  calculateSemesterScore,
-  pickStrongestWeakest,
-  type CourseScore,
-  type SemesterScore,
-} from "@/calculations/score";
+import { calculateSemesterScore, pickStrongestWeakest, type CourseScore, type SemesterScore } from "@/calculations/score";
+import { assessCourseStatus, type CourseStatus } from "@/calculations/status";
 
 export interface CourseCard {
   id: string;
@@ -17,6 +13,8 @@ export interface CourseCard {
   credits: number;
   totalMarks: number;
   score: CourseScore;
+  /** §18 health status; null while nothing is graded. */
+  status: CourseStatus | null;
 }
 
 export interface SemesterOverview {
@@ -69,14 +67,18 @@ export async function getSemesterOverview(
     listAssessmentsForCourses(courseIds),
   ]);
 
-  const courseCards: CourseCard[] = semester.courses.map((course) => ({
-    id: course.id,
-    name: course.name,
-    code: course.code,
-    credits: Number(course.credits),
-    totalMarks: Number(course.total_marks),
-    score: buildCourseScore(course, categories, assessments),
-  }));
+  const courseCards: CourseCard[] = semester.courses.map((course) => {
+    const score = buildCourseScore(course, categories, assessments);
+    return {
+      id: course.id,
+      name: course.name,
+      code: course.code,
+      credits: Number(course.credits),
+      totalMarks: Number(course.total_marks),
+      score,
+      status: assessCourseStatus(score, Number(course.passing_marks)),
+    };
+  });
 
   const semesterScore = calculateSemesterScore(
     courseCards.map((c) => c.score)

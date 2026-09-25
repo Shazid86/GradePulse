@@ -1,12 +1,45 @@
+import { ArrowDownRight, ArrowUpRight, Minus } from "lucide-react";
 import { pickStrongestWeakest, type CourseScore } from "@/calculations/score";
+import type { TrendAnalysis } from "@/calculations/trend";
+import type { CourseStatus } from "@/calculations/status";
 import { formatMarks, formatPercent } from "@/lib/format";
 import { StatCard } from "@/components/dashboard/stat-card";
+import { StatusBadge } from "@/components/analytics/status-badge";
+import { Badge } from "@/components/ui/badge";
+
+const TREND_META = {
+  improving: { label: "Improving", Icon: ArrowUpRight },
+  declining: { label: "Declining", Icon: ArrowDownRight },
+  stable: { label: "Stable", Icon: Minus },
+} as const;
+
+function TrendBadge({ trend }: { trend: TrendAnalysis | null }) {
+  if (!trend || trend.sampleSize < 2) return null;
+  const meta = TREND_META[trend.direction];
+  const Icon = meta.Icon;
+  const sign = trend.slope > 0 ? "+" : "";
+  return (
+    <Badge variant="secondary" className="gap-1 font-normal">
+      <Icon className="size-3" aria-hidden="true" />
+      Trend: {meta.label} ({sign}
+      {trend.slope} pts/step)
+    </Badge>
+  );
+}
 
 /**
  * Course score summary (spec §23): current score, percentage, remaining,
- * maximum possible + strongest/weakest graded category (§19).
+ * maximum possible + strongest/weakest (§19) + status (§18) + trend (§17).
  */
-export function CourseSummary({ score }: { score: CourseScore }) {
+export function CourseSummary({
+  score,
+  status,
+  trend,
+}: {
+  score: CourseScore;
+  status: CourseStatus | null;
+  trend: TrendAnalysis | null;
+}) {
   const { strongest, weakest } = pickStrongestWeakest(
     score.categories,
     (category) => category.percentage
@@ -14,6 +47,11 @@ export function CourseSummary({ score }: { score: CourseScore }) {
 
   return (
     <section aria-label="Score summary" className="space-y-3">
+      <div className="flex flex-wrap items-center gap-2">
+        <StatusBadge status={status} />
+        <TrendBadge trend={trend} />
+      </div>
+
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <StatCard
           label="Current score"

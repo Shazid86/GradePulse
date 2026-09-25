@@ -143,10 +143,10 @@ check(
 );
 
 const assessments = [
-  { c: "att", title: "Attendance", obtained_marks: 9, maximum_marks: 10, status: "completed" },
-  { c: "ct", title: "CT 1", obtained_marks: 8, maximum_marks: 10, status: "completed" },
-  { c: "ct", title: "CT 2", obtained_marks: null, maximum_marks: 10, status: "pending" },
-  { c: "asg", title: "Assignment 1", obtained_marks: 24, maximum_marks: 30, status: "completed" },
+  { c: "att", title: "Attendance", obtained_marks: 9, maximum_marks: 10, status: "completed", date: "2026-09-01" },
+  { c: "ct", title: "CT 1", obtained_marks: 8, maximum_marks: 10, status: "completed", date: "2026-09-10" },
+  { c: "ct", title: "CT 2", obtained_marks: null, maximum_marks: 10, status: "pending", date: "2026-09-20" },
+  { c: "asg", title: "Assignment 1", obtained_marks: 24, maximum_marks: 30, status: "completed", date: "2026-09-05" },
 ];
 for (const a of assessments) {
   const { error } = await rest.from("assessments").insert({
@@ -156,6 +156,7 @@ for (const a of assessments) {
     obtained_marks: a.obtained_marks,
     maximum_marks: a.maximum_marks,
     status: a.status,
+    date: a.date,
   });
   if (error) check(`seed: assessment ${a.title}`, false, error.message);
 }
@@ -200,6 +201,7 @@ const has = (html, ...markers) => markers.every((m) => html.includes(m));
     "dashboard course card values (remaining/max)",
     has(html, "QA Database Systems", "Remaining 59 · Max possible 91")
   );
+  check("dashboard shows course health status (§18)", has(html, "At Risk"));
   check("dashboard lists the empty course too", has(html, "QA Empty Course"));
   check(
     "dashboard is mobile-first responsive",
@@ -239,6 +241,31 @@ const has = (html, ...markers) => markers.every((m) => html.includes(m));
     "assessment list shows marks + pending",
     has(html, "9 / 10", "8 / 10", "24 / 30", "Pending / 10")
   );
+  check(
+    "course health status badge (§18: 41% < 50 → At Risk)",
+    has(html, "At Risk")
+  );
+  check(
+    "analytics cards render (§16)",
+    has(html, "Performance over time", "Category comparison", "Assessment progression")
+  );
+  check(
+    "category comparison chart container present",
+    has(html, "Category comparison chart")
+  );
+  check(
+    "trend chip renders from dated data (§17: 90, 80, 80 → declining)",
+    has(html, "Trend: Declining")
+  );
+  check(
+    "chart containers render with data (§16)",
+    has(
+      html,
+      "Assessment performance over time chart",
+      "Assessment progression chart",
+      "Category comparison chart"
+    )
+  );
 }
 
 // Empty state: course with no categories.
@@ -252,6 +279,18 @@ const has = (html, ...markers) => markers.every((m) => html.includes(m));
   check(
     "empty assessments state shown",
     has(html, "Add an assessment category before recording assessments")
+  );
+  check(
+    "empty course: trend chart empty state (§17)",
+    has(html, "Record at least two dated assessments")
+  );
+  check(
+    "empty course: category comparison empty state",
+    has(html, "Grade assessments to compare your categories")
+  );
+  check(
+    "empty course: progression empty state",
+    has(html, "Dated, graded assessments will build your progression curve")
   );
 }
 

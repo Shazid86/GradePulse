@@ -63,6 +63,7 @@ src/
   app/                  Routes: (auth) login/signup, (app) dashboard/semesters/courses, auth/callback
   calculations/         Pure calculation engine + unit tests (no UI, no DB)
   components/
+    analytics/          Charts (Recharts), status badge, target progress
     auth/               Login/signup forms
     courses/            Course dialogs, summary, category breakdown
     dashboard/          Stat cards, course cards, semester overview
@@ -73,7 +74,8 @@ src/
     ui/                 shadcn/ui primitives
   features/             Server actions + zod validations + queries per entity
     dashboard/          Dashboard/semester overview data assembly
-    scores/             DB rows → calculation engine inputs
+    scores/             DB rows → calculation engine inputs + analytics view-model
+    targets/            Read-only target lookup
   lib/
     supabase/           Client/server/proxy session layer + env guard
     format.ts           Display formatting over engine rounding
@@ -97,7 +99,8 @@ for tabular marks/figures, loaded via `next/font`.
 - ✅ **Phase 1 — Foundation**: scaffold, Supabase integration, auth, schema, RLS, app shell, navigation, theme
 - ✅ **Phase 2 — Academic structure**: semester/course/category/assessment CRUD, validation, pure calculation engine (47 unit tests)
 - ✅ **Phase 3 — Dashboard**: main dashboard, semester overview, course cards, course detail scores, category breakdown, strongest/weakest summaries
-- ⬜ Phase 4+ — analytics, target engine, GPA/CGPA, calendar, polish
+- ✅ **Phase 4 — Analytics**: performance-over-time, category comparison, assessment progression, target progress, status (§18), trend analysis (§17)
+- ⬜ Phase 5+ — target engine, GPA/CGPA, calendar, polish
 
 ## Security
 
