@@ -3,9 +3,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Pencil, Trash2 } from "lucide-react";
 import { deleteSemester } from "@/features/semesters/actions";
-import { getSemester } from "@/features/semesters/queries";
+import { getSemesterOverview } from "@/features/dashboard/queries";
 import { SemesterFormDialog } from "@/components/semesters/semester-form-dialog";
 import { SemesterCourses } from "@/components/semesters/semester-courses";
+import { SemesterSummary } from "@/components/semesters/semester-summary";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -18,8 +19,9 @@ export default async function SemesterDetailPage({
   params: Promise<{ semesterId: string }>;
 }) {
   const { semesterId } = await params;
-  const semester = await getSemester(semesterId);
-  if (!semester) notFound();
+  const { overview } = await getSemesterOverview(semesterId);
+  if (!overview) notFound();
+  const { semester } = overview;
 
   return (
     <div className="mx-auto w-full max-w-4xl space-y-6">
@@ -80,6 +82,8 @@ export default async function SemesterDetailPage({
           </div>
         </div>
       </header>
+
+      <SemesterSummary overview={overview} />
 
       <SemesterCourses semesterId={semester.id} courses={semester.courses} />
     </div>

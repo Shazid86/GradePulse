@@ -191,3 +191,66 @@ export function calculateCourseScore(input: CourseScoreInput): CourseScore {
     categories,
   };
 }
+
+export interface SemesterScore {
+  courseCount: number;
+  totalMarks: number;
+  securedMarks: number;
+  remainingMarks: number;
+  /** Overall percentage across the semester: Σ secured / Σ total. */
+  percentage: number;
+}
+
+/** Aggregates course scores into a semester-level summary (spec §22). */
+export function calculateSemesterScore(
+  courses: Pick<CourseScore, "totalMarks" | "securedMarks">[]
+): SemesterScore {
+  const totalMarks = roundTo(
+    sum(courses.map((c) => Math.max(0, toFiniteNumber(c.totalMarks))))
+  );
+  const securedMarks = roundTo(
+    sum(courses.map((c) => Math.max(0, toFiniteNumber(c.securedMarks))))
+  );
+
+  return {
+    courseCount: courses.length,
+    totalMarks,
+    securedMarks,
+    remainingMarks: roundTo(Math.max(0, totalMarks - securedMarks)),
+    percentage: percentage(securedMarks, totalMarks),
+  };
+}
+
+export interface Extremes<T> {
+  strongest: T | null;
+  weakest: T | null;
+}
+
+/**
+ * Strongest/weakest by score (spec §19). Items whose score is null
+ * (e.g. ungraded categories/courses) are excluded; ties keep the first.
+ */
+export function pickStrongestWeakest<T>(
+  items: T[],
+  scoreOf: (item: T) => number | null
+): Extremes<T> {
+  let strongest: T | null = null;
+  let strongestScore = Number.NEGATIVE_INFINITY;
+  let weakest: T | null = null;
+  let weakestScore = Number.POSITIVE_INFINITY;
+
+  for (const item of items) {
+    const score = scoreOf(item);
+    if (score === null || !Number.isFinite(score)) continue;
+    if (score > strongestScore) {
+      strongestScore = score;
+      strongest = item;
+    }
+    if (score < weakestScore) {
+      weakestScore = score;
+      weakest = item;
+    }
+  }
+
+  return { strongest, weakest };
+}

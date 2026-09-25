@@ -37,7 +37,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 const signUp = async (tag) => {
   const client = createClient(url, anon);
-  const email = `gp-qa-${tag}-${Date.now()}@gradepulse.dev`;
+  const email = `gradepulse.qa.${tag}.${Date.now()}@gmail.com`;
   for (let attempt = 1; attempt <= 40; attempt++) {
     const { data, error } = await client.auth.signUp({
       email,

@@ -5,11 +5,19 @@ import type { AssessmentCategoryRow } from "@/types/database";
 export async function listCategories(
   courseId: string
 ): Promise<AssessmentCategoryRow[]> {
+  return listCategoriesForCourses([courseId]);
+}
+
+/** Categories for many courses in one query (dashboard/semester overview). */
+export async function listCategoriesForCourses(
+  courseIds: string[]
+): Promise<AssessmentCategoryRow[]> {
+  if (courseIds.length === 0) return [];
   const supabase = await createClient();
   const { data } = await supabase
     .from("assessment_categories")
     .select("*")
-    .eq("course_id", courseId)
+    .in("course_id", courseIds)
     .order("sort_order", { ascending: true })
     .order("created_at", { ascending: true });
 

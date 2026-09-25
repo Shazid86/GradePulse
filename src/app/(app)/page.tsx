@@ -1,4 +1,10 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+import {
+  findCurrentSemester,
+  getSemesterOverview,
+} from "@/features/dashboard/queries";
+import { SemesterOverviewView } from "@/components/dashboard/semester-overview";
 import {
   Card,
   CardContent,
@@ -10,15 +16,37 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { BrandMark } from "@/components/layout/brand";
 
+export const metadata: Metadata = { title: "Dashboard" };
+
 const ONBOARDING_STEPS = [
-  { step: "01", title: "Create a semester", detail: "e.g. Fall 2026 with its academic year and dates" },
-  { step: "02", title: "Add your courses", detail: "Credits, total marks, passing marks, grading scale" },
-  { step: "03", title: "Define assessment structure", detail: "Categories and their weights — e.g. Final = 40" },
-  { step: "04", title: "Record assessments", detail: "Marks, dates, attendance — as they happen" },
-  { step: "05", title: "See your performance", detail: "Scores, targets, required marks and trends" },
+  {
+    step: "01",
+    title: "Create a semester",
+    detail: "e.g. Fall 2026 with its academic year and dates",
+  },
+  {
+    step: "02",
+    title: "Add your courses",
+    detail: "Credits, total marks, passing marks, grading scale",
+  },
+  {
+    step: "03",
+    title: "Define assessment structure",
+    detail: "Categories and their weights — e.g. Final = 40",
+  },
+  {
+    step: "04",
+    title: "Record assessments",
+    detail: "Marks, dates, attendance — as they happen",
+  },
+  {
+    step: "05",
+    title: "See your performance",
+    detail: "Scores, targets, required marks and trends",
+  },
 ];
 
-export default function DashboardPage() {
+function Onboarding() {
   return (
     <div className="mx-auto w-full max-w-3xl">
       <Card className="glass border-border/70">
@@ -58,4 +86,29 @@ export default function DashboardPage() {
       </Card>
     </div>
   );
+}
+
+function LoadError({ message }: { message: string }) {
+  return (
+    <div
+      role="alert"
+      className="mx-auto w-full max-w-md rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive"
+    >
+      {message}
+    </div>
+  );
+}
+
+export default async function DashboardPage() {
+  const current = await findCurrentSemester();
+
+  if (current.error) return <LoadError message={current.error} />;
+  if (!current.hasAny || !current.semesterId) return <Onboarding />;
+
+  const { overview, error } = await getSemesterOverview(current.semesterId);
+  if (error || !overview) {
+    return <LoadError message={error ?? "Could not load the semester."} />;
+  }
+
+  return <SemesterOverviewView overview={overview} />;
 }

@@ -54,6 +54,7 @@ GradePulse transforms raw academic records — class tests, quizzes, assignments
 | `npm run typecheck`   | TypeScript type checking                 |
 | `npm test`            | Unit tests for the calculation engine    |
 | `npm run verify:rls`  | Live persistence + RLS checks (real DB)  |
+| `npm run qa:smoke`    | Authenticated page smoke (app on :3000)  |
 
 ## Project structure
 
@@ -63,21 +64,26 @@ src/
   calculations/         Pure calculation engine + unit tests (no UI, no DB)
   components/
     auth/               Login/signup forms
-    courses/            Course dialogs
+    courses/            Course dialogs, summary, category breakdown
+    dashboard/          Stat cards, course cards, semester overview
     layout/             Shell: sidebar, topbar, nav, theme
-    semesters/          Semester dialogs + course list section
+    semesters/          Semester dialogs, course list, summary strip
     shared/             Cross-feature UI (confirm dialog)
     structure/          Category/assessment dialogs + cards
     ui/                 shadcn/ui primitives
   features/             Server actions + zod validations + queries per entity
+    dashboard/          Dashboard/semester overview data assembly
+    scores/             DB rows → calculation engine inputs
   lib/
     supabase/           Client/server/proxy session layer + env guard
+    format.ts           Display formatting over engine rounding
     utils.ts
   validations/          Shared validation primitives
   types/                Database row types
   proxy.ts              Session refresh + route protection (Next.js 16)
 scripts/
   verify-rls.mjs        Live RLS + persistence verification (throwaway QA users)
+  qa-smoke.mjs          Authenticated page assertions (seeded QA data)
 supabase/migrations/    Versioned SQL migrations
 ```
 
@@ -89,8 +95,9 @@ for tabular marks/figures, loaded via `next/font`.
 ## Project status
 
 - ✅ **Phase 1 — Foundation**: scaffold, Supabase integration, auth, schema, RLS, app shell, navigation, theme
-- ✅ **Phase 2 — Academic structure**: semester/course/category/assessment CRUD, validation, pure calculation engine (37 unit tests)
-- ⬜ Phase 3+ — dashboard, analytics, target engine, GPA/CGPA, calendar, polish
+- ✅ **Phase 2 — Academic structure**: semester/course/category/assessment CRUD, validation, pure calculation engine (47 unit tests)
+- ✅ **Phase 3 — Dashboard**: main dashboard, semester overview, course cards, course detail scores, category breakdown, strongest/weakest summaries
+- ⬜ Phase 4+ — analytics, target engine, GPA/CGPA, calendar, polish
 
 ## Security
 

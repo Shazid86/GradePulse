@@ -6,7 +6,10 @@ import { deleteCourse } from "@/features/courses/actions";
 import { getCourse } from "@/features/courses/queries";
 import { listCategories } from "@/features/categories/queries";
 import { listAssessments } from "@/features/assessments/queries";
+import { buildCourseScore } from "@/features/scores/assembly";
 import { CourseFormDialog } from "@/components/courses/course-form-dialog";
+import { CourseSummary } from "@/components/courses/course-summary";
+import { CategoryBreakdown } from "@/components/courses/category-breakdown";
 import { StructureCard } from "@/components/structure/structure-card";
 import { AssessmentsCard } from "@/components/structure/assessments-card";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
@@ -35,6 +38,7 @@ export default async function CourseDetailPage({
       (assessmentCountByCategory.get(assessment.category_id) ?? 0) + 1
     );
   }
+  const score = buildCourseScore(course, categories, assessments);
 
   return (
     <div className="mx-auto w-full max-w-4xl space-y-6">
@@ -92,6 +96,10 @@ export default async function CourseDetailPage({
           </div>
         </div>
       </header>
+
+      <CourseSummary score={score} />
+
+      <CategoryBreakdown categories={score.categories} />
 
       <StructureCard
         courseId={course.id}
