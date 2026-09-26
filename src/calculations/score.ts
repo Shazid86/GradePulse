@@ -28,6 +28,8 @@ export interface AssessmentInput {
   obtained_marks: number | null;
   maximum_marks: number;
   status: AssessmentStatus;
+  /** Presentation metadata only — never used in calculations. */
+  title?: string;
 }
 
 export interface CategoryScore {

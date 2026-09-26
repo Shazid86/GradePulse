@@ -162,6 +162,15 @@ for (const a of assessments) {
 }
 check("seed: assessments created", true);
 
+const { error: targetErr } = await rest.from("targets").insert({
+  user_id: userId,
+  course_id: courseA.id,
+  label: "Custom",
+  percentage: 80,
+  kind: "custom",
+});
+check("seed: target 80% created", !targetErr, targetErr?.message);
+
 // --- Authenticated page fetches -------------------------------------------
 const cookieHeader = [...jar]
   .map(([name, value]) => `${name}=${value}`)
@@ -266,6 +275,25 @@ const has = (html, ...markers) => markers.every((m) => html.includes(m));
       "Category comparison chart"
     )
   );
+  check(
+    "target analysis hero (§14: 41 secured, 80 target → need 39/59)",
+    has(
+      html,
+      "Target achievable",
+      "You need 39 / 59 remaining marks",
+      "66.1%",
+      "Target: 80%",
+      "(80 marks)"
+    )
+  );
+  check(
+    "what-if simulator with pending + unassessed inputs (§15)",
+    has(html, "What-if simulator", "CT 2", "no assessments yet")
+  );
+  check(
+    "simulator readout present",
+    has(html, "Current", "Projected %", "Change")
+  );
 }
 
 // Empty state: course with no categories.
@@ -291,6 +319,14 @@ const has = (html, ...markers) => markers.every((m) => html.includes(m));
   check(
     "empty course: progression empty state",
     has(html, "Dated, graded assessments will build your progression curve")
+  );
+  check(
+    "empty course: no-target state (§14 empty)",
+    has(html, "Set a target to see exactly what you need")
+  );
+  check(
+    "empty course: simulator closed state (§15)",
+    has(html, "All marks are final")
   );
 }
 

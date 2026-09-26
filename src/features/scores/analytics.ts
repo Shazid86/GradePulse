@@ -1,8 +1,10 @@
-import { buildCourseScore } from "./assembly";
+import { toCourseScoreInput } from "./assembly";
 import {
+  calculateCourseScore,
   pickStrongestWeakest,
   type CategoryScore,
   type CourseScore,
+  type CourseScoreInput,
 } from "@/calculations/score";
 import {
   analyzeTrend,
@@ -24,6 +26,8 @@ import type {
 } from "@/types/database";
 
 export interface CourseAnalytics {
+  /** Serializable engine input — handed to the what-if simulator. */
+  input: CourseScoreInput;
   score: CourseScore;
   status: CourseStatus | null;
   series: PerformancePoint[];
@@ -48,7 +52,8 @@ export function buildCourseAnalytics(
   categories: AssessmentCategoryRow[],
   assessments: AssessmentRow[]
 ): CourseAnalytics {
-  const score = buildCourseScore(course, categories, assessments);
+  const input = toCourseScoreInput(course, categories, assessments);
+  const score = calculateCourseScore(input);
 
   const series = buildPerformanceSeries(assessments);
   const trend = analyzeTrend(series);
@@ -69,6 +74,7 @@ export function buildCourseAnalytics(
   );
 
   return {
+    input,
     score,
     status: assessCourseStatus(score, Number(course.passing_marks)),
     series,

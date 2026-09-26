@@ -100,7 +100,8 @@ for tabular marks/figures, loaded via `next/font`.
 - ✅ **Phase 2 — Academic structure**: semester/course/category/assessment CRUD, validation, pure calculation engine (47 unit tests)
 - ✅ **Phase 3 — Dashboard**: main dashboard, semester overview, course cards, course detail scores, category breakdown, strongest/weakest summaries
 - ✅ **Phase 4 — Analytics**: performance-over-time, category comparison, assessment progression, target progress, status (§18), trend analysis (§17)
-- ⬜ Phase 5+ — target engine, GPA/CGPA, calendar, polish
+- ✅ **Phase 5 — Target engine**: target selection (Pass/grading-scale presets/custom), required-score analysis with achieved/achievable/impossible detection, interactive what-if simulator
+- ⬜ Phase 6+ — GPA/CGPA, calendar, polish
 
 ## Security
 

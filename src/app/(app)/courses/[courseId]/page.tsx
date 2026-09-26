@@ -8,6 +8,7 @@ import { listCategories } from "@/features/categories/queries";
 import { listAssessments } from "@/features/assessments/queries";
 import { buildCourseAnalytics } from "@/features/scores/analytics";
 import { getCourseTarget } from "@/features/targets/queries";
+import { buildTargetPresets } from "@/features/targets/presets";
 import { CourseFormDialog } from "@/components/courses/course-form-dialog";
 import { CourseSummary } from "@/components/courses/course-summary";
 import { CategoryBreakdown } from "@/components/courses/category-breakdown";
@@ -15,7 +16,8 @@ import { ChartCard } from "@/components/analytics/chart-card";
 import { PerformanceTrendChart } from "@/components/analytics/performance-trend-chart";
 import { CategoryComparisonChart } from "@/components/analytics/category-comparison-chart";
 import { AssessmentProgressionChart } from "@/components/analytics/assessment-progression-chart";
-import { TargetProgress } from "@/components/analytics/target-progress";
+import { TargetAnalysis } from "@/components/targets/target-analysis";
+import { WhatIfSimulator } from "@/components/targets/what-if-simulator";
 import { StructureCard } from "@/components/structure/structure-card";
 import { AssessmentsCard } from "@/components/structure/assessments-card";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
@@ -143,10 +145,14 @@ export default async function CourseDetailPage({
         />
       </ChartCard>
 
-      <TargetProgress
+      <TargetAnalysis
+        course={course}
         target={target}
-        securedPercentage={score.percentage}
+        score={score}
+        presets={buildTargetPresets(course)}
       />
+
+      <WhatIfSimulator input={analytics.input} current={score} />
 
       <CategoryBreakdown categories={score.categories} />
 
