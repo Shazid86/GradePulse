@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/supabase/auth";
 import type { ActionResult } from "@/features/types";
 import { firstIssue } from "@/validations/common";
-import { courseFormSchema } from "./validations";
+import { courseFormSchema, gradingScaleSchema } from "./validations";
 
 function readForm(formData: FormData) {
   return {
@@ -100,5 +100,42 @@ export async function deleteCourse(
   revalidatePath("/semesters");
   revalidatePath(`/semesters/${data.semester_id}`);
   if (redirectTo) redirect(redirectTo);
+  return {};
+}
+
+/** Saves the course's configurable grading scale (§21). Rows as JSON. */
+export async function saveGradingScale(
+  formData: FormData
+): Promise<ActionResult> {
+  const ctx = await requireUser();
+  if ("error" in ctx) return { error: ctx.error };
+
+  const id = formData.get("course_id");
+  if (typeof id !== "string") return { error: "Invalid course." };
+
+  let rows: unknown;
+  try {
+    rows = JSON.parse(String(formData.get("scale") ?? "[]"));
+  } catch {
+    return { error: "Invalid grading scale." };
+  }
+
+  const parsed = gradingScaleSchema.safeParse(rows);
+  if (!parsed.success) return { error: firstIssue(parsed.error) };
+
+  const { data, error } = await ctx.supabase
+    .from("courses")
+    .update({ grading_scale: parsed.data })
+    .eq("id", id)
+    .select("id")
+    .maybeSingle();
+
+  if (error) return { error: "Could not save the grading scale." };
+  if (!data) return { error: "Course not found or not yours." };
+
+  revalidatePath(`/courses/${id}`);
+  revalidatePath("/");
+  revalidatePath("/gpa");
+  revalidatePath("/semesters");
   return {};
 }

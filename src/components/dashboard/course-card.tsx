@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { formatMarks, formatPercent } from "@/lib/format";
+import { formatMarks, formatGpa, formatPercent } from "@/lib/format";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { StatusBadge } from "@/components/analytics/status-badge";
@@ -24,9 +24,20 @@ export function CourseCard({ course }: { course: CourseCardData }) {
                 {course.credits} credits
               </p>
             </div>
-            <Badge variant="outline" className="shrink-0 font-mono text-[11px]">
+          <div className="flex shrink-0 flex-wrap items-center justify-end gap-1">
+            {course.grade && (
+              <Badge
+                variant="secondary"
+                className="font-medium text-primary"
+                title="Grade point"
+              >
+                {course.grade} · {formatGpa(course.gradePoint)}
+              </Badge>
+            )}
+            <Badge variant="outline" className="font-mono text-[11px]">
               {course.code}
             </Badge>
+          </div>
           </div>
 
           <div className="flex items-end justify-between gap-2">

@@ -14,6 +14,7 @@ export interface SemesterDetail extends SemesterRow {
     total_marks: number;
     passing_marks: number;
     instructor: string | null;
+    grading_scale: unknown;
   }[];
 }
 
@@ -45,7 +46,7 @@ export async function getSemester(id: string): Promise<SemesterDetail | null> {
   const { data } = await supabase
     .from("semesters")
     .select(
-      "*, courses:courses(id, name, code, credits, total_marks, passing_marks, instructor)"
+      "*, courses:courses(id, name, code, credits, total_marks, passing_marks, instructor, grading_scale)"
     )
     .eq("id", id)
     .order("created_at", { ascending: true, referencedTable: "courses" })

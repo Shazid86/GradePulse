@@ -19,3 +19,11 @@ export function formatPercent(
   if (!Number.isFinite(n)) return "—";
   return `${roundTo(n, 1)}%`;
 }
+
+/** GPA/grade point for UI: "3.70"; "—" when not available. */
+export function formatGpa(value: number | string | null | undefined): string {
+  if (value === null || value === undefined) return "—";
+  const n = Number(value);
+  if (!Number.isFinite(n)) return "—";
+  return Number(roundTo(n, 2)).toFixed(2);
+}

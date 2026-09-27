@@ -97,7 +97,11 @@ const { data: courseA } = await rest
     credits: 3,
     total_marks: 100,
     passing_marks: 50,
-    grading_scale: [],
+    grading_scale: [
+      { grade: "C", min_percentage: 40, grade_point: 2 },
+      { grade: "B", min_percentage: 70, grade_point: 3 },
+      { grade: "A", min_percentage: 85, grade_point: 4 },
+    ],
   })
   .select()
   .single();
@@ -171,6 +175,57 @@ const { error: targetErr } = await rest.from("targets").insert({
 });
 check("seed: target 80% created", !targetErr, targetErr?.message);
 
+// --- Completed semester for CGPA (§21): 85% → A (4.0) × 3 credits --------
+const { data: semDone } = await rest
+  .from("semesters")
+  .insert({
+    user_id: userId,
+    name: `QA Completed ${stamp}`,
+    academic_year: "2098-2099",
+    start_date: "2098-09-01",
+    end_date: "2098-12-31",
+    status: "completed",
+  })
+  .select()
+  .single();
+check("seed: completed semester created", Boolean(semDone));
+
+const { data: doneCourse } = await rest
+  .from("courses")
+  .insert({
+    user_id: userId,
+    semester_id: semDone?.id,
+    name: "QA Done Course",
+    code: "QA-200",
+    credits: 3,
+    total_marks: 100,
+    passing_marks: 50,
+    grading_scale: [{ grade: "A", min_percentage: 80, grade_point: 4 }],
+  })
+  .select()
+  .single();
+const { data: doneCat } = await rest
+  .from("assessment_categories")
+  .insert({
+    user_id: userId,
+    course_id: doneCourse?.id,
+    name: "Exams",
+    weight: 100,
+    sort_order: 0,
+  })
+  .select()
+  .single();
+const { error: doneAsmErr } = await rest.from("assessments").insert({
+  user_id: userId,
+  category_id: doneCat?.id,
+  title: "Final Exam",
+  obtained_marks: 85,
+  maximum_marks: 100,
+  status: "completed",
+  date: "2098-12-20",
+});
+check("seed: completed-semester course graded 85/100", !doneAsmErr);
+
 // --- Authenticated page fetches -------------------------------------------
 const cookieHeader = [...jar]
   .map(([name, value]) => `${name}=${value}`)
@@ -211,6 +266,11 @@ const has = (html, ...markers) => markers.every((m) => html.includes(m));
     has(html, "QA Database Systems", "Remaining 59 · Max possible 91")
   );
   check("dashboard shows course health status (§18)", has(html, "At Risk"));
+  check(
+    "dashboard semester GPA (§21: C 2.0×3 credits, ungraded excluded)",
+    has(html, "Semester GPA", "2.00", "over 3 graded credits")
+  );
+  check("dashboard course card shows grade (§21)", has(html, "C · 2.00"));
   check("dashboard lists the empty course too", has(html, "QA Empty Course"));
   check(
     "dashboard is mobile-first responsive",
@@ -294,6 +354,36 @@ const has = (html, ...markers) => markers.every((m) => html.includes(m));
     "simulator readout present",
     has(html, "Current", "Projected %", "Change")
   );
+  check(
+    "course grade badge from configured scale (§21)",
+    has(html, "Grade C · 2.00 GP")
+  );
+  check("grading scale editor entry point", has(html, "Grading scale"));
+}
+
+// GPA & CGPA page (§21).
+{
+  const { status, html } = await fetchPage("/gpa");
+  check("gpa page responds 200", status === 200, `got ${status}`);
+  check(
+    "CGPA across completed semesters only (§21)",
+    has(
+      html,
+      "Cumulative GPA",
+      "4.00",
+      "Across 1 completed semester · 3 graded credits"
+    )
+  );
+  check(
+    "semester history rows (§21 historical performance)",
+    has(
+      html,
+      "Semester history",
+      `QA Completed ${stamp}`,
+      "85%",
+      "QA Smoke"
+    )
+  );
 }
 
 // Empty state: course with no categories.
@@ -331,6 +421,15 @@ const has = (html, ...markers) => markers.every((m) => html.includes(m));
 }
 
 // --- Cleanup (cascade proof) ----------------------------------------------
+await rest.from("semesters").delete().eq("id", semDone.id);
+const { data: doneLeft } = await rest
+  .from("courses")
+  .select("id")
+  .eq("id", doneCourse.id);
+check(
+  "cleanup: completed semester cascade removed its course",
+  (doneLeft ?? []).length === 0
+);
 await rest.from("semesters").delete().eq("id", sem.id);
 const { data: leftover } = await rest
   .from("courses")

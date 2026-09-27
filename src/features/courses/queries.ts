@@ -39,3 +39,14 @@ export async function getCourse(id: string): Promise<CourseDetail | null> {
 
   return (data as CourseDetail | null) ?? null;
 }
+
+/** Every course of the signed-in user (GPA/CGPA overview). */
+export async function listAllCourses(): Promise<CourseRow[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("courses")
+    .select("*")
+    .order("created_at", { ascending: true });
+
+  return (data ?? []) as CourseRow[];
+}

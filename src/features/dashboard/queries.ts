@@ -5,6 +5,7 @@ import { listAssessmentsForCourses } from "@/features/assessments/queries";
 import { buildCourseScore } from "@/features/scores/assembly";
 import { calculateSemesterScore, pickStrongestWeakest, type CourseScore, type SemesterScore } from "@/calculations/score";
 import { assessCourseStatus, type CourseStatus } from "@/calculations/status";
+import { calculateGpa, gradeForCourse, type GpaResult } from "@/calculations/grading";
 
 export interface CourseCard {
   id: string;
@@ -15,11 +16,16 @@ export interface CourseCard {
   score: CourseScore;
   /** §18 health status; null while nothing is graded. */
   status: CourseStatus | null;
+  /** §21 letter grade from the course's configured scale; null if none. */
+  grade: string | null;
+  gradePoint: number | null;
 }
 
 export interface SemesterOverview {
   semester: SemesterDetail;
   semesterScore: SemesterScore;
+  /** Credit-weighted GPA of this semester (graded courses only). */
+  gpa: GpaResult;
   courseCards: CourseCard[];
   strongestCourse: CourseCard | null;
   weakestCourse: CourseCard | null;
@@ -69,6 +75,7 @@ export async function getSemesterOverview(
 
   const courseCards: CourseCard[] = semester.courses.map((course) => {
     const score = buildCourseScore(course, categories, assessments);
+    const graded = gradeForCourse(score, course.grading_scale);
     return {
       id: course.id,
       name: course.name,
@@ -77,8 +84,14 @@ export async function getSemesterOverview(
       totalMarks: Number(course.total_marks),
       score,
       status: assessCourseStatus(score, Number(course.passing_marks)),
+      grade: graded?.grade ?? null,
+      gradePoint: graded?.gradePoint ?? null,
     };
   });
+
+  const gpa = calculateGpa(
+    courseCards.map((c) => ({ credits: c.credits, gradePoint: c.gradePoint }))
+  );
 
   const semesterScore = calculateSemesterScore(
     courseCards.map((c) => c.score)
@@ -95,6 +108,7 @@ export async function getSemesterOverview(
     overview: {
       semester,
       semesterScore,
+      gpa,
       courseCards,
       strongestCourse: strongest,
       weakestCourse: weakest,

@@ -1,4 +1,5 @@
 import { toCourseScoreInput } from "./assembly";
+import { gradeForCourse } from "@/calculations/grading";
 import {
   calculateCourseScore,
   pickStrongestWeakest,
@@ -30,6 +31,8 @@ export interface CourseAnalytics {
   input: CourseScoreInput;
   score: CourseScore;
   status: CourseStatus | null;
+  /** §21 letter grade from the course's configured scale. */
+  grade: { grade: string; gradePoint: number } | null;
   series: PerformancePoint[];
   trend: TrendAnalysis;
   progression: ProgressionPoint[];
@@ -41,6 +44,7 @@ interface CourseLike {
   id: string;
   total_marks: number | string;
   passing_marks: number | string;
+  grading_scale: unknown;
 }
 
 /**
@@ -77,6 +81,7 @@ export function buildCourseAnalytics(
     input,
     score,
     status: assessCourseStatus(score, Number(course.passing_marks)),
+    grade: gradeForCourse(score, course.grading_scale),
     series,
     trend,
     progression,

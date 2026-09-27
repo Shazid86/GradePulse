@@ -1,4 +1,4 @@
-import { formatMarks, formatPercent } from "@/lib/format";
+import { formatMarks, formatGpa, formatPercent } from "@/lib/format";
 import type { SemesterOverview } from "@/features/dashboard/queries";
 import { StatCard } from "@/components/dashboard/stat-card";
 
@@ -11,11 +11,20 @@ export function SemesterSummary({
   const { semesterScore, strongestCourse, weakestCourse } = overview;
 
   return (
-    <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+    <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
       <StatCard
         label="Overall"
         value={formatPercent(semesterScore.percentage)}
         hint={`${formatMarks(semesterScore.securedMarks)} / ${formatMarks(semesterScore.totalMarks)} marks`}
+      />
+      <StatCard
+        label="Semester GPA"
+        value={formatGpa(overview.gpa.gpa)}
+        hint={
+          overview.gpa.gradedCredits > 0
+            ? `${overview.gpa.gradedCourses} graded courses`
+            : "no grades yet"
+        }
       />
       <StatCard
         label="Remaining"

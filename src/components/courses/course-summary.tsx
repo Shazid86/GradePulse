@@ -2,7 +2,7 @@ import { ArrowDownRight, ArrowUpRight, Minus } from "lucide-react";
 import { pickStrongestWeakest, type CourseScore } from "@/calculations/score";
 import type { TrendAnalysis } from "@/calculations/trend";
 import type { CourseStatus } from "@/calculations/status";
-import { formatMarks, formatPercent } from "@/lib/format";
+import { formatMarks, formatGpa, formatPercent } from "@/lib/format";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { StatusBadge } from "@/components/analytics/status-badge";
 import { Badge } from "@/components/ui/badge";
@@ -35,10 +35,12 @@ export function CourseSummary({
   score,
   status,
   trend,
+  grade,
 }: {
   score: CourseScore;
   status: CourseStatus | null;
   trend: TrendAnalysis | null;
+  grade: { grade: string; gradePoint: number } | null;
 }) {
   const { strongest, weakest } = pickStrongestWeakest(
     score.categories,
@@ -48,6 +50,11 @@ export function CourseSummary({
   return (
     <section aria-label="Score summary" className="space-y-3">
       <div className="flex flex-wrap items-center gap-2">
+        {grade && (
+          <Badge variant="outline" className="border-primary/40 bg-primary/10 font-medium text-primary">
+            Grade {grade.grade} · {formatGpa(grade.gradePoint)} GP
+          </Badge>
+        )}
         <StatusBadge status={status} />
         <TrendBadge trend={trend} />
       </div>

@@ -10,6 +10,8 @@ import { buildCourseAnalytics } from "@/features/scores/analytics";
 import { getCourseTarget } from "@/features/targets/queries";
 import { buildTargetPresets } from "@/features/targets/presets";
 import { CourseFormDialog } from "@/components/courses/course-form-dialog";
+import { GradingScaleDialog } from "@/components/courses/grading-scale-dialog";
+import { Scale } from "lucide-react";
 import { CourseSummary } from "@/components/courses/course-summary";
 import { CategoryBreakdown } from "@/components/courses/category-breakdown";
 import { ChartCard } from "@/components/analytics/chart-card";
@@ -79,6 +81,15 @@ export default async function CourseDetailPage({
           </div>
 
           <div className="flex items-center gap-2">
+            <GradingScaleDialog
+              course={course}
+              trigger={
+                <Button variant="outline" size="sm">
+                  <Scale aria-hidden="true" />
+                  Grading scale
+                </Button>
+              }
+            />
             <CourseFormDialog
               semesterId={course.semester_id}
               course={course}
@@ -111,6 +122,7 @@ export default async function CourseDetailPage({
         score={score}
         status={analytics.status}
         trend={analytics.trend}
+        grade={analytics.grade}
       />
 
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">

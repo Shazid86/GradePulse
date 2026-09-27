@@ -1,4 +1,5 @@
 import { percentage } from "@/calculations/score";
+import { parseGradingScale } from "@/calculations/grading";
 
 export interface TargetPreset {
   label: string;
@@ -35,27 +36,13 @@ export function buildTargetPresets(course: CourseShape): TargetPreset[] {
     });
   }
 
-  const scale = course.grading_scale;
-  if (Array.isArray(scale)) {
-    for (const entry of scale) {
-      if (!entry || typeof entry !== "object") continue;
-      const e = entry as { grade?: unknown; min_percentage?: unknown };
-      const min = Number(e.min_percentage);
-      if (
-        typeof e.grade === "string" &&
-        e.grade.trim() &&
-        Number.isFinite(min) &&
-        min > 0 &&
-        min <= 100
-      ) {
-        presets.push({
-          label: e.grade.trim().slice(0, 12),
-          percentage: min,
-          kind: "preset",
-          gradeLabel: e.grade.trim().slice(0, 12),
-        });
-      }
-    }
+  for (const entry of parseGradingScale(course.grading_scale)) {
+    presets.push({
+      label: entry.grade,
+      percentage: entry.min_percentage,
+      kind: "preset",
+      gradeLabel: entry.grade,
+    });
   }
 
   return presets;

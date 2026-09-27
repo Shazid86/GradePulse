@@ -63,19 +63,21 @@ src/
   app/                  Routes: (auth) login/signup, (app) dashboard/semesters/courses, auth/callback
   calculations/         Pure calculation engine + unit tests (no UI, no DB)
   components/
-    analytics/          Charts (Recharts), status badge, target progress
+    analytics/          Charts (Recharts), status badge
     auth/               Login/signup forms
-    courses/            Course dialogs, summary, category breakdown
+    courses/            Course dialogs, summary, grading scale editor
     dashboard/          Stat cards, course cards, semester overview
     layout/             Shell: sidebar, topbar, nav, theme
     semesters/          Semester dialogs, course list, summary strip
     shared/             Cross-feature UI (confirm dialog)
     structure/          Category/assessment dialogs + cards
+    targets/            Target analysis, target form, what-if simulator
     ui/                 shadcn/ui primitives
   features/             Server actions + zod validations + queries per entity
     dashboard/          Dashboard/semester overview data assembly
+    gpa/                GPA/CGPA + semester history overview
     scores/             DB rows → calculation engine inputs + analytics view-model
-    targets/            Read-only target lookup
+    targets/            Target CRUD + data-driven presets
   lib/
     supabase/           Client/server/proxy session layer + env guard
     format.ts           Display formatting over engine rounding
@@ -101,7 +103,8 @@ for tabular marks/figures, loaded via `next/font`.
 - ✅ **Phase 3 — Dashboard**: main dashboard, semester overview, course cards, course detail scores, category breakdown, strongest/weakest summaries
 - ✅ **Phase 4 — Analytics**: performance-over-time, category comparison, assessment progression, target progress, status (§18), trend analysis (§17)
 - ✅ **Phase 5 — Target engine**: target selection (Pass/grading-scale presets/custom), required-score analysis with achieved/achievable/impossible detection, interactive what-if simulator
-- ⬜ Phase 6+ — GPA/CGPA, calendar, polish
+- ✅ **Phase 6 — GPA/CGPA**: per-course configurable grading scales, letter grades, credit-weighted semester GPA, CGPA across completed semesters, historical semester performance
+- ⬜ Phase 7+ — calendar, polish
 
 ## Security
 

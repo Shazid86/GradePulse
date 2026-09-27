@@ -37,3 +37,31 @@ export const courseFormSchema = z
     message: "Passing marks cannot exceed total marks.",
     path: ["passing_marks"],
   });
+
+/** One row of a configurable grading scale (§21) — any scale magnitude. */
+export const gradingScaleEntrySchema = z.object({
+  grade: z
+    .string()
+    .trim()
+    .min(1, "Grade name is required.")
+    .max(12, "Grade must be at most 12 characters."),
+  min_percentage: z.coerce
+    .number({ message: "Threshold must be a number." })
+    .min(0, "Threshold must be 0 or above.")
+    .max(100, "Threshold cannot exceed 100%."),
+  grade_point: z.coerce
+    .number({ message: "Grade point must be a number." })
+    .min(0, "Grade point cannot be negative.")
+    .max(100, "Grade point must be 100 or less."),
+});
+
+export const gradingScaleSchema = z
+  .array(gradingScaleEntrySchema)
+  .max(20, "A scale can have at most 20 rows.")
+  .refine(
+    (rows) => {
+      const mins = rows.map((r) => r.min_percentage);
+      return new Set(mins).size === mins.length;
+    },
+    { message: "Threshold percentages must be unique." }
+  );

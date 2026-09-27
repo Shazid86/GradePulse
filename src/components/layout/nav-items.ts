@@ -1,4 +1,4 @@
-import { GraduationCap, LayoutDashboard, type LucideIcon } from "lucide-react";
+import { Award, GraduationCap, LayoutDashboard, type LucideIcon } from "lucide-react";
 
 export interface NavItem {
   title: string;
@@ -13,4 +13,5 @@ export interface NavItem {
 export const navItems: NavItem[] = [
   { title: "Dashboard", href: "/", icon: LayoutDashboard },
   { title: "Semesters", href: "/semesters", icon: GraduationCap },
+  { title: "GPA", href: "/gpa", icon: Award },
 ];
