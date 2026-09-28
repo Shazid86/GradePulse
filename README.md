@@ -60,14 +60,18 @@ GradePulse transforms raw academic records — class tests, quizzes, assignments
 
 ```
 src/
-  app/                  Routes: (auth) login/signup, (app) dashboard/semesters/courses, auth/callback
+  app/
+    (public)/           Marketing site: /, /features, /how-it-works, /about, /contact
+    (app)/              Private app: /dashboard, /semesters, /courses, /gpa
+    auth/               /auth/login, /auth/signup, /auth/callback
   calculations/         Pure calculation engine + unit tests (no UI, no DB)
   components/
     analytics/          Charts (Recharts), status badge
     auth/               Login/signup forms
+    marketing/          Public site header/footer
     courses/            Course dialogs, summary, grading scale editor
     dashboard/          Stat cards, course cards, semester overview
-    layout/             Shell: sidebar, topbar, nav, theme
+    layout/             App shell: sidebar, topbar, nav, theme
     semesters/          Semester dialogs, course list, summary strip
     shared/             Cross-feature UI (confirm dialog)
     structure/          Category/assessment dialogs + cards
@@ -85,6 +89,9 @@ src/
   validations/          Shared validation primitives
   types/                Database row types
   proxy.ts              Session refresh + route protection (Next.js 16)
+                        PUBLIC ALLOWLIST: /, /features, /how-it-works,
+                        /about, /contact, /auth/* — everything else
+                        requires a session (default-deny)
 scripts/
   verify-rls.mjs        Live RLS + persistence verification (throwaway QA users)
   qa-smoke.mjs          Authenticated page assertions (seeded QA data)
@@ -104,6 +111,7 @@ for tabular marks/figures, loaded via `next/font`.
 - ✅ **Phase 4 — Analytics**: performance-over-time, category comparison, assessment progression, target progress, status (§18), trend analysis (§17)
 - ✅ **Phase 5 — Target engine**: target selection (Pass/grading-scale presets/custom), required-score analysis with achieved/achievable/impossible detection, interactive what-if simulator
 - ✅ **Phase 6 — GPA/CGPA**: per-course configurable grading scales, letter grades, credit-weighted semester GPA, CGPA across completed semesters, historical semester performance
+- ✅ **Phase 6.5 — Public site + app boundary**: marketing pages at `/`, `/features`, `/how-it-works`, `/about`, `/contact` (public allowlist in `lib/supabase/proxy.ts` — **default-deny for everything else**), auth at `/auth/login` + `/auth/signup`, dashboard migrated to `/dashboard`; public and authenticated layouts fully separated
 - ⬜ Phase 7+ — calendar, polish
 
 ## Security

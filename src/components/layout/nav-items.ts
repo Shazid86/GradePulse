@@ -11,7 +11,7 @@ export interface NavItem {
  * (e.g. Calendar) — sidebar and mobile nav pick them up.
  */
 export const navItems: NavItem[] = [
-  { title: "Dashboard", href: "/", icon: LayoutDashboard },
+  { title: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { title: "Semesters", href: "/semesters", icon: GraduationCap },
   { title: "GPA", href: "/gpa", icon: Award },
 ];

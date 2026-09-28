@@ -247,9 +247,60 @@ async function fetchPage(path) {
 
 const has = (html, ...markers) => markers.every((m) => html.includes(m));
 
+/** Fetch WITHOUT auth cookies — for public-route / redirect checks. */
+async function fetchAnon(path) {
+  const res = await fetch(`${BASE}${path}`, { redirect: "manual" });
+  return {
+    status: res.status,
+    location: res.headers.get("location") ?? "",
+    html:
+      res.status >= 200 && res.status < 300
+        ? (await res.text()).replaceAll("<!-- -->", "")
+        : "",
+  };
+}
+
+// --- Public / private boundary (Phase 6.5) --------------------------------
+{
+  for (const path of [
+    "/",
+    "/features",
+    "/how-it-works",
+    "/about",
+    "/contact",
+  ]) {
+    const r = await fetchAnon(path);
+    check(`public route ${path} loads without auth`, r.status === 200, `got ${r.status}`);
+  }
+  const login = await fetchAnon("/auth/login");
+  check("auth page /auth/login loads without auth", login.status === 200, `got ${login.status}`);
+
+  for (const path of ["/dashboard", "/semesters", "/gpa", "/courses/xyz"]) {
+    const r = await fetchAnon(path);
+    check(
+      `protected route ${path} redirects unauthenticated`,
+      r.status >= 300 && r.status < 400 && r.location.includes("/auth/login"),
+      `got ${r.status} → ${r.location}`
+    );
+  }
+  const legacy = await fetchAnon("/login");
+  check(
+    "legacy /login redirects to /auth/login",
+    legacy.status >= 300 && legacy.status < 400 && legacy.location.includes("/auth/login"),
+    `got ${legacy.status} → ${legacy.location}`
+  );
+  const home = await fetchAnon("/");
+  check(
+    "public home renders marketing chrome",
+    home.html.includes("GradePulse") &&
+      home.html.includes("Get Started") &&
+      home.html.includes('aria-label="Open navigation"')
+  );
+}
+
 // Dashboard (§22): overall %, counts, strongest/attention, course cards.
 {
-  const { status, html } = await fetchPage("/");
+  const { status, html } = await fetchPage("/dashboard");
   check("dashboard responds 200 when authenticated", status === 200, `got ${status}`);
   check("dashboard shows the active semester", has(html, `QA Smoke ${stamp}`));
   check(
@@ -271,6 +322,10 @@ const has = (html, ...markers) => markers.every((m) => html.includes(m));
     has(html, "Semester GPA", "2.00", "over 3 graded credits")
   );
   check("dashboard course card shows grade (§21)", has(html, "C · 2.00"));
+  check(
+    "app navigation: sidebar → /dashboard + mobile menu present",
+    has(html, 'href="/dashboard"', 'aria-label="Open navigation"')
+  );
   check("dashboard lists the empty course too", has(html, "QA Empty Course"));
   check(
     "dashboard is mobile-first responsive",

@@ -12,7 +12,7 @@ export default async function SignupPage({
 
   return (
     <div className="w-full max-w-sm">
-      <SignupForm next={next ?? "/"} />
+      <SignupForm next={next ?? "/dashboard"} />
     </div>
   );
 }

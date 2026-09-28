@@ -12,7 +12,7 @@ export default async function LoginPage({
 
   return (
     <div className="w-full max-w-sm">
-      <LoginForm next={next ?? "/"} initialError={error} />
+      <LoginForm next={next ?? "/dashboard"} initialError={error} />
     </div>
   );
 }

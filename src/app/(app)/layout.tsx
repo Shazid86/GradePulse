@@ -10,7 +10,7 @@ export default async function AppLayout({
   children: React.ReactNode;
 }) {
   if (!isSupabaseConfigured()) {
-    redirect("/login");
+    redirect("/auth/login");
   }
 
   const supabase = await createClient();
@@ -19,7 +19,7 @@ export default async function AppLayout({
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect("/login");
+    redirect("/auth/login");
   }
 
   return (

@@ -3,6 +3,19 @@ import { NextResponse, type NextRequest } from "next/server";
 import { getSupabaseEnv, isSupabaseConfigured } from "./env";
 
 /**
+ * Explicit public allowlist (Phase 6.5). Every path NOT listed here is
+ * PRIVATE BY DEFAULT, so future application routes (e.g. /calendar) stay
+ * protected automatically. Do not broaden this list without review.
+ */
+const PUBLIC_PATHS = new Set([
+  "/",
+  "/features",
+  "/how-it-works",
+  "/about",
+  "/contact",
+]);
+
+/**
  * Refreshes the Supabase auth session on every matched request and enforces
  * route protection. Runs in the proxy layer (edge), before rendering.
  *
@@ -41,21 +54,24 @@ export async function updateSession(
   } = await supabase.auth.getUser();
 
   const { pathname, search } = request.nextUrl;
-  const isAuthRoute = pathname === "/login" || pathname === "/signup";
-  const isCallbackRoute = pathname.startsWith("/auth/");
+  // /auth/login, /auth/signup, /auth/callback — the whole segment is public.
+  const isAuthSegment = pathname.startsWith("/auth/");
+  const isAuthPage = pathname === "/auth/login" || pathname === "/auth/signup";
+  const isPublic = PUBLIC_PATHS.has(pathname) || isAuthSegment;
 
   // Unauthenticated → login (remembering the intended destination).
-  if (!user && !isAuthRoute && !isCallbackRoute) {
+  // Default-deny: anything outside the allowlist requires a session.
+  if (!user && !isPublic) {
     const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = "/login";
+    redirectUrl.pathname = "/auth/login";
     redirectUrl.search = `?next=${encodeURIComponent(`${pathname}${search}`)}`;
     return NextResponse.redirect(redirectUrl);
   }
 
   // Authenticated away from the auth pages → dashboard.
-  if (user && isAuthRoute) {
+  if (user && isAuthPage) {
     const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = "/";
+    redirectUrl.pathname = "/dashboard";
     redirectUrl.search = "";
     return NextResponse.redirect(redirectUrl);
   }

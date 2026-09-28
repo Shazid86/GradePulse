@@ -33,7 +33,7 @@ export function SignupForm({ next }: { next: string }) {
         </CardHeader>
         <CardContent>
           <Button asChild variant="outline" className="w-full">
-            <Link href={`/login?next=${encodeURIComponent(next)}`}>
+            <Link href={`/auth/login?next=${encodeURIComponent(next)}`}>
               Back to sign in
             </Link>
           </Button>
@@ -115,7 +115,7 @@ export function SignupForm({ next }: { next: string }) {
         <p className="mt-4 text-center text-sm text-muted-foreground">
           Already have an account?{" "}
           <Link
-            href={`/login?next=${encodeURIComponent(next)}`}
+            href={`/auth/login?next=${encodeURIComponent(next)}`}
             className="font-medium text-primary underline-offset-4 hover:underline"
           >
             Sign in

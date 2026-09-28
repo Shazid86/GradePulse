@@ -93,7 +93,7 @@ export function LoginForm({
         <p className="mt-4 text-center text-sm text-muted-foreground">
           No account yet?{" "}
           <Link
-            href={`/signup?next=${encodeURIComponent(next)}`}
+            href={`/auth/signup?next=${encodeURIComponent(next)}`}
             className="font-medium text-primary underline-offset-4 hover:underline"
           >
             Sign up
