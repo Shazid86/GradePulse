@@ -2,6 +2,10 @@ import { createClient } from "@/lib/supabase/server";
 import { getSemester, type SemesterDetail } from "@/features/semesters/queries";
 import { listCategoriesForCourses } from "@/features/categories/queries";
 import { listAssessmentsForCourses } from "@/features/assessments/queries";
+import {
+  listUpcomingForCourses,
+  type EventWithCourse,
+} from "@/features/events/queries";
 import { buildCourseScore } from "@/features/scores/assembly";
 import { calculateSemesterScore, pickStrongestWeakest, type CourseScore, type SemesterScore } from "@/calculations/score";
 import { assessCourseStatus, type CourseStatus } from "@/calculations/status";
@@ -29,6 +33,8 @@ export interface SemesterOverview {
   courseCards: CourseCard[];
   strongestCourse: CourseCard | null;
   weakestCourse: CourseCard | null;
+  /** Next incomplete events in this semester (§22 upcoming assessments). */
+  upcomingEvents: EventWithCourse[];
 }
 
 /**
@@ -68,9 +74,10 @@ export async function getSemesterOverview(
   }
 
   const courseIds = semester.courses.map((c) => c.id);
-  const [categories, assessments] = await Promise.all([
+  const [categories, assessments, upcomingEvents] = await Promise.all([
     listCategoriesForCourses(courseIds),
     listAssessmentsForCourses(courseIds),
+    listUpcomingForCourses(courseIds, 5),
   ]);
 
   const courseCards: CourseCard[] = semester.courses.map((course) => {
@@ -112,6 +119,7 @@ export async function getSemesterOverview(
       courseCards,
       strongestCourse: strongest,
       weakestCourse: weakest,
+      upcomingEvents,
     },
   };
 }

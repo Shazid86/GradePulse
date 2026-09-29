@@ -62,7 +62,7 @@ GradePulse transforms raw academic records — class tests, quizzes, assignments
 src/
   app/
     (public)/           Marketing site: /, /features, /how-it-works, /about, /contact
-    (app)/              Private app: /dashboard, /semesters, /courses, /gpa
+    (app)/              Private app: /dashboard, /semesters, /courses, /gpa, /calendar
     auth/               /auth/login, /auth/signup, /auth/callback
   calculations/         Pure calculation engine + unit tests (no UI, no DB)
   components/
@@ -70,7 +70,8 @@ src/
     auth/               Login/signup forms
     marketing/          Public site header/footer
     courses/            Course dialogs, summary, grading scale editor
-    dashboard/          Stat cards, course cards, semester overview
+    dashboard/          Stat cards, course cards, semester overview, upcoming events
+    events/             Calendar rows, countdown badge, event dialog
     layout/             App shell: sidebar, topbar, nav, theme
     semesters/          Semester dialogs, course list, summary strip
     shared/             Cross-feature UI (confirm dialog)
@@ -79,6 +80,7 @@ src/
     ui/                 shadcn/ui primitives
   features/             Server actions + zod validations + queries per entity
     dashboard/          Dashboard/semester overview data assembly
+    events/             Academic-event CRUD + upcoming-event queries
     gpa/                GPA/CGPA + semester history overview
     scores/             DB rows → calculation engine inputs + analytics view-model
     targets/            Target CRUD + data-driven presets
@@ -112,7 +114,8 @@ for tabular marks/figures, loaded via `next/font`.
 - ✅ **Phase 5 — Target engine**: target selection (Pass/grading-scale presets/custom), required-score analysis with achieved/achievable/impossible detection, interactive what-if simulator
 - ✅ **Phase 6 — GPA/CGPA**: per-course configurable grading scales, letter grades, credit-weighted semester GPA, CGPA across completed semesters, historical semester performance
 - ✅ **Phase 6.5 — Public site + app boundary**: marketing pages at `/`, `/features`, `/how-it-works`, `/about`, `/contact` (public allowlist in `lib/supabase/proxy.ts` — **default-deny for everything else**), auth at `/auth/login` + `/auth/signup`, dashboard migrated to `/dashboard`; public and authenticated layouts fully separated
-- ⬜ Phase 7+ — calendar, polish
+- ✅ **Phase 7 — Calendar/events**: academic events per course (CT, Quiz, Assignment, Midterm, Final, Presentation, Viva, Project, or free-text Custom) with date, notes and completion state; `/calendar` page (Upcoming + Earlier & completed), countdown badges (Today / Tomorrow / In N days / N days ago, amber ≤3 days, red overdue, green completed), one-click completion toggle, and the "Upcoming assessments" section on the dashboard. Date math is local-date-only and DST-safe in `lib/dates.ts` (rejects impossible dates)
+- ⬜ Phase 8+ — polish, notifications
 
 ## Security
 

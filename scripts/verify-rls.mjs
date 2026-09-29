@@ -97,6 +97,7 @@ check("A creates semester (persistence)", Boolean(sem) && !semErr);
 
 let courseId = null;
 let catId = null;
+let eventId = null;
 if (sem) {
   const { data: course } = await a.client
     .from("courses")
@@ -169,6 +170,47 @@ if (sem) {
     .from("semesters")
     .insert(semesterPayload);
   check("DB rejects duplicate semester name/year", dupErr?.code === "23505", `code=${dupErr?.code}`);
+
+  // Academic events (§20): completion state + date round-trip.
+  const { data: ev } = await a.client
+    .from("academic_events")
+    .insert({
+      user_id: a.session.user.id,
+      course_id: courseId,
+      title: "Midterm",
+      event_date: "2099-10-15",
+      type: "Midterm",
+    })
+    .select()
+    .single();
+  check(
+    "A creates academic event (§20) with date-only round-trip",
+    Boolean(ev) && ev?.event_date === "2099-10-15" && ev?.is_completed === false
+  );
+  eventId = ev?.id ?? null;
+
+  const { data: toggled } = await a.client
+    .from("academic_events")
+    .update({ is_completed: true })
+    .eq("id", eventId)
+    .select("is_completed")
+    .maybeSingle();
+  check("A toggles event completion (§20)", toggled?.is_completed === true);
+
+  const { error: longTitleErr } = await a.client
+    .from("academic_events")
+    .insert({
+      user_id: a.session.user.id,
+      course_id: courseId,
+      title: "x".repeat(161),
+      event_date: "2099-10-16",
+      type: "Custom",
+    });
+  check(
+    "DB rejects an over-long event title",
+    longTitleErr?.code === "23514",
+    `code=${longTitleErr?.code}`
+  );
 }
 
 // --- Cross-user isolation (user B vs user A's rows) -----------------------
@@ -203,6 +245,37 @@ if (sem) {
     stillMine?.name === semesterPayload.name
   );
 
+  const { data: bSeesEvent } = await b.client
+    .from("academic_events")
+    .select("id")
+    .eq("id", eventId);
+  check("B cannot select A's event", (bSeesEvent ?? []).length === 0);
+
+  const { data: bUpdEvent } = await b.client
+    .from("academic_events")
+    .update({ title: "Hijacked" })
+    .eq("id", eventId)
+    .select("id");
+  check("B cannot update A's event", (bUpdEvent ?? []).length === 0);
+
+  const { data: bDelEvent } = await b.client
+    .from("academic_events")
+    .delete()
+    .eq("id", eventId)
+    .select("id");
+  check("B cannot delete A's event", (bDelEvent ?? []).length === 0);
+
+  const { data: eventMine } = await a.client
+    .from("academic_events")
+    .select("id, title")
+    .eq("id", eventId)
+    .maybeSingle();
+  check(
+    "A's event untouched after B's attempts",
+    eventMine?.title === "Midterm",
+    eventMine?.title
+  );
+
   // --- Cascade cleanup ----------------------------------------------------
   const { data: deleted } = await a.client
     .from("semesters")
@@ -229,6 +302,13 @@ if (sem) {
       .select("id")
       .eq("category_id", catId);
     check("assessment cascaded away", (asmGone ?? []).length === 0);
+  }
+  if (eventId) {
+    const { data: evGone } = await a.client
+      .from("academic_events")
+      .select("id")
+      .eq("id", eventId);
+    check("event cascaded away with its course", (evGone ?? []).length === 0);
   }
 }
 

@@ -3,8 +3,9 @@
  * GradePulse QA: authenticated page smoke test.
  * Signs up a throwaway account (Confirm email must be OFF), seeds a known
  * dataset, serializes session cookies exactly like @supabase/ssr, fetches
- * dashboard/semester/course pages and asserts the values the calculation
- * engine must have rendered — including empty states. Cleans up after itself.
+ * dashboard/semester/course/calendar/gpa pages and asserts the values the
+ * calculation engine must have rendered — including empty states, countdown
+ * badges and the event completion round-trip. Cleans up after itself.
  * Run: npm run qa:smoke   (app must be running on :3000)
  */
 import { readFileSync } from "node:fs";
@@ -61,6 +62,35 @@ if (!signed.session) {
   process.exit(0);
 }
 check("signUp returned a session (confirmation off)", true);
+
+// --- Authenticated page fetches (cookie jar filled by signUp) -------------
+const cookieHeader = [...jar]
+  .map(([name, value]) => `${name}=${value}`)
+  .join("; ");
+
+async function fetchPage(path) {
+  const res = await fetch(`${BASE}${path}`, {
+    headers: { cookie: cookieHeader },
+    redirect: "manual",
+  });
+  const html =
+    res.status >= 200 && res.status < 300
+      ? // React SSR inserts `<!-- -->` between adjacent text interpolations;
+        // strip them so plain substring assertions work.
+        (await res.text()).replaceAll("<!-- -->", "")
+      : "";
+  return { status: res.status, html };
+}
+
+
+// Calendar is empty before any courses/events exist (§20 empty state).
+{
+  const cal = await fetchPage("/calendar");
+  check(
+    "calendar empty state: no courses yet",
+    cal.status === 200 && cal.html.includes("No courses yet")
+  );
+}
 
 const userId = signed.session.user.id;
 const rest = createRestClient(url, anon, {
@@ -226,24 +256,35 @@ const { error: doneAsmErr } = await rest.from("assessments").insert({
 });
 check("seed: completed-semester course graded 85/100", !doneAsmErr);
 
-// --- Authenticated page fetches -------------------------------------------
-const cookieHeader = [...jar]
-  .map(([name, value]) => `${name}=${value}`)
-  .join("; ");
-
-async function fetchPage(path) {
-  const res = await fetch(`${BASE}${path}`, {
-    headers: { cookie: cookieHeader },
-    redirect: "manual",
-  });
-  const html =
-    res.status >= 200 && res.status < 300
-      ? // React SSR inserts `<!-- -->` between adjacent text interpolations;
-        // strip them so plain substring assertions work.
-        (await res.text()).replaceAll("<!-- -->", "")
-      : "";
-  return { status: res.status, html };
+// --- Academic events (§20): upcoming, overdue, completed ------------------
+const localPlus = (days) => {
+  const d = new Date();
+  d.setDate(d.getDate() + days);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+};
+const events = [
+  { title: "QA Quiz", type: "Quiz", event_date: localPlus(3), is_completed: false },
+  { title: "QA Overdue HW", type: "Assignment", event_date: localPlus(-2), is_completed: false },
+  { title: "QA Done Event", type: "CT", event_date: localPlus(1), is_completed: true },
+];
+const seededEvents = [];
+for (const ev of events) {
+  const { data, error } = await rest
+    .from("academic_events")
+    .insert({
+      user_id: userId,
+      course_id: courseA.id,
+      ...ev,
+    })
+    .select("id, title")
+    .single();
+  if (error) check(`seed: event ${ev.title}`, false, error.message);
+  else seededEvents.push(data);
 }
+check("seed: academic events created", seededEvents.length === events.length);
+const qaQuizId = seededEvents.find((e) => e.title === "QA Quiz")?.id;
+
+// --- Authenticated page fetches: `fetchPage` is defined above (line ~77) ---
 
 const has = (html, ...markers) => markers.every((m) => html.includes(m));
 
@@ -275,7 +316,7 @@ async function fetchAnon(path) {
   const login = await fetchAnon("/auth/login");
   check("auth page /auth/login loads without auth", login.status === 200, `got ${login.status}`);
 
-  for (const path of ["/dashboard", "/semesters", "/gpa", "/courses/xyz"]) {
+  for (const path of ["/dashboard", "/semesters", "/gpa", "/calendar", "/courses/xyz"]) {
     const r = await fetchAnon(path);
     check(
       `protected route ${path} redirects unauthenticated`,
@@ -325,6 +366,14 @@ async function fetchAnon(path) {
   check(
     "app navigation: sidebar → /dashboard + mobile menu present",
     has(html, 'href="/dashboard"', 'aria-label="Open navigation"')
+  );
+  check(
+    "dashboard upcoming-events section (§22)",
+    has(html, "Upcoming assessments", "QA Quiz", "In 3 days", 'href="/calendar"')
+  );
+  check(
+    "dashboard excludes completed events from upcoming",
+    !html.includes("QA Done Event")
   );
   check("dashboard lists the empty course too", has(html, "QA Empty Course"));
   check(
@@ -416,6 +465,61 @@ async function fetchAnon(path) {
   check("grading scale editor entry point", has(html, "Grading scale"));
 }
 
+// Academic calendar (§20).
+{
+  const { status, html } = await fetchPage("/calendar");
+  check("calendar page responds 200", status === 200, `got ${status}`);
+  check(
+    "calendar shows upcoming with countdown (§20)",
+    has(html, "Upcoming", "QA Quiz", "In 3 days", "Quiz")
+  );
+  check(
+    "calendar shows overdue countdown in earlier section",
+    has(html, "Earlier", "QA Overdue HW", "2 days ago")
+  );
+  check(
+    "calendar shows completion state",
+    has(html, "QA Done Event", "Completed")
+  );
+  check(
+    "calendar nav entry exists",
+    has(html, 'href="/calendar"')
+  );
+
+  // The toggle is a Server Action form: the action id and the id/completed
+  // payload the action reads are rendered straight into the markup.
+  const at = html.indexOf('aria-label="Mark QA Quiz as completed"');
+  const formHtml =
+    at === -1
+      ? ""
+      : html.slice(html.lastIndexOf("<form", at), html.indexOf("</form>", at));
+  check(
+    "event toggle is wired to a Server Action form",
+    formHtml.includes("$ACTION_ID_") &&
+      formHtml.includes(`value="${qaQuizId}"`) &&
+      formHtml.includes('name="completed"')
+  );
+
+  // Completion round-trip: flip the row, then assert both rendered states.
+  const { error: toggleError } = await rest
+    .from("academic_events")
+    .update({ is_completed: true })
+    .eq("id", qaQuizId);
+  check("completion toggle persists (§20)", !toggleError, toggleError?.message);
+
+  const after = await fetchPage("/calendar");
+  check(
+    "completed event shows Completed badge and leaves Upcoming",
+    has(after.html, "QA Quiz", "Completed", "Nothing scheduled right now.")
+  );
+
+  const dashAfter = await fetchPage("/dashboard");
+  check(
+    "dashboard drops the just-completed event",
+    !dashAfter.html.includes("QA Quiz")
+  );
+}
+
 // GPA & CGPA page (§21).
 {
   const { status, html } = await fetchPage("/gpa");
@@ -491,6 +595,14 @@ const { data: leftover } = await rest
   .select("id")
   .eq("id", courseA.id);
 check("cleanup: semester cascade removed courses", (leftover ?? []).length === 0);
+const { data: eventsLeft } = await rest
+  .from("academic_events")
+  .select("id")
+  .eq("course_id", courseA.id);
+check(
+  "cleanup: events cascaded with their course",
+  (eventsLeft ?? []).length === 0
+);
 
 console.log(
   failures === 0 ? "\nALL CHECKS PASSED" : `\n${failures} CHECK(S) FAILED`

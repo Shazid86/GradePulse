@@ -2,6 +2,7 @@ import { formatMarks, formatGpa, formatPercent } from "@/lib/format";
 import type { SemesterOverview } from "@/features/dashboard/queries";
 import { StatCard } from "./stat-card";
 import { CourseCard } from "./course-card";
+import { UpcomingEvents } from "./upcoming-events";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -82,6 +83,8 @@ export function SemesterOverviewView({
           }
         />
       </div>
+
+      <UpcomingEvents events={overview.upcomingEvents} />
 
       <section aria-labelledby="dashboard-courses" className="space-y-3">
         <h2 id="dashboard-courses" className="text-lg font-medium">
