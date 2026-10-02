@@ -4,21 +4,12 @@ import type {
   AssessmentCategoryRow,
   AssessmentRow,
 } from "@/types/database";
+import { formatDate } from "@/lib/format";
 import { AssessmentFormDialog } from "@/components/structure/assessment-form-dialog";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
-function formatDate(value: string | null): string {
-  if (!value) return "No date";
-  return new Date(value).toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-    timeZone: "UTC",
-  });
-}
 
 /** Assessments card: list with marks/status + assessment CRUD. */
 export function AssessmentsCard({

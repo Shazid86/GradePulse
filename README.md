@@ -52,7 +52,7 @@ GradePulse transforms raw academic records — class tests, quizzes, assignments
 | `npm run start`       | Start production server                  |
 | `npm run lint`        | ESLint                                   |
 | `npm run typecheck`   | TypeScript type checking                 |
-| `npm test`            | Unit tests for the calculation engine    |
+| `npm test`            | Unit tests (engine + validation schemas) |
 | `npm run verify:rls`  | Live persistence + RLS checks (real DB)  |
 | `npm run qa:smoke`    | Authenticated page smoke (app on :3000)  |
 
@@ -85,7 +85,7 @@ src/
     scores/             DB rows → calculation engine inputs + analytics view-model
     targets/            Target CRUD + data-driven presets
   lib/
-    supabase/           Client/server/proxy session layer + env guard
+    supabase/           Server/proxy session layer + env guard
     format.ts           Display formatting over engine rounding
     utils.ts
   validations/          Shared validation primitives
@@ -115,7 +115,8 @@ for tabular marks/figures, loaded via `next/font`.
 - ✅ **Phase 6 — GPA/CGPA**: per-course configurable grading scales, letter grades, credit-weighted semester GPA, CGPA across completed semesters, historical semester performance
 - ✅ **Phase 6.5 — Public site + app boundary**: marketing pages at `/`, `/features`, `/how-it-works`, `/about`, `/contact` (public allowlist in `lib/supabase/proxy.ts` — **default-deny for everything else**), auth at `/auth/login` + `/auth/signup`, dashboard migrated to `/dashboard`; public and authenticated layouts fully separated
 - ✅ **Phase 7 — Calendar/events**: academic events per course (CT, Quiz, Assignment, Midterm, Final, Presentation, Viva, Project, or free-text Custom) with date, notes and completion state; `/calendar` page (Upcoming + Earlier & completed), countdown badges (Today / Tomorrow / In N days / N days ago, amber ≤3 days, red overdue, green completed), one-click completion toggle, and the "Upcoming assessments" section on the dashboard. Date math is local-date-only and DST-safe in `lib/dates.ts` (rejects impossible dates)
-- ⬜ Phase 8+ — polish, notifications
+- ✅ **Phase 8 — Production QA pass**: shared `lib/format.ts` date rendering (fixes UTC off-by-one west of UTC) replacing four local copies, ISO date validation round-trip (rejects impossible dates like `2026-02-31`), skip-to-content links in both layouts, branded 404, nav active-state simplification, calendar query error state, dead-code cleanup (unused browser client util + separator component), validation schema tests (107 unit tests total) and smoke suite grown to 85 checks
+- ⬜ Notifications — future work
 
 ## Security
 

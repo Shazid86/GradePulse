@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import type { EventWithCourse } from "@/features/events/queries";
+import { formatDateShort } from "@/lib/format";
 import { CountdownBadge } from "@/components/events/countdown-badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,14 +10,6 @@ import {
   CardDescription,
   CardHeader,
 } from "@/components/ui/card";
-
-function formatDate(value: string): string {
-  return new Date(`${value}T00:00:00Z`).toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    timeZone: "UTC",
-  });
-}
 
 /** Dashboard "upcoming assessments" section (spec §22) for the current semester. */
 export function UpcomingEvents({ events }: { events: EventWithCourse[] }) {
@@ -53,7 +46,7 @@ export function UpcomingEvents({ events }: { events: EventWithCourse[] }) {
                   className="flex flex-wrap items-center gap-x-3 gap-y-1 py-3"
                 >
                   <span className="w-16 shrink-0 font-mono text-xs text-muted-foreground tabular-nums">
-                    {formatDate(event.event_date)}
+                    {formatDateShort(event.event_date)}
                   </span>
                   <span className="min-w-0 flex-1 truncate text-sm font-medium">
                     {event.title}

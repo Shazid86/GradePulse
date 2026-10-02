@@ -6,19 +6,29 @@ export interface EventWithCourse extends AcademicEventRow {
   course: { id: string; name: string; code: string };
 }
 
+type EventRowWithCourse = AcademicEventRow & {
+  course: { id: string; name: string; code: string };
+};
+
+function toEvents(data: EventRowWithCourse[] | null): EventWithCourse[] {
+  return (data ?? []).map(({ course, ...event }) => ({ ...event, course }));
+}
+
 /** All events for the signed-in user (RLS), soonest first. */
-export async function listEvents(): Promise<EventWithCourse[]> {
+export async function listEvents(): Promise<{
+  events: EventWithCourse[];
+  error?: string;
+}> {
   const supabase = await createClient();
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("academic_events")
     .select(
       "*, course:courses!inner(id, name, code)"
     )
     .order("event_date", { ascending: true });
 
-  return ((data ?? []) as unknown as (AcademicEventRow & {
-    course: { id: string; name: string; code: string };
-  })[]).map(({ course, ...event }) => ({ ...event, course }));
+  if (error) return { events: [], error: "Could not load calendar events." };
+  return { events: toEvents(data as EventRowWithCourse[] | null) };
 }
 
 /**
@@ -31,7 +41,7 @@ export async function listUpcomingForCourses(
 ): Promise<EventWithCourse[]> {
   if (courseIds.length === 0) return [];
   const supabase = await createClient();
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("academic_events")
     .select("*, course:courses!inner(id, name, code)")
     .in("course_id", courseIds)
@@ -40,7 +50,6 @@ export async function listUpcomingForCourses(
     .order("event_date", { ascending: true })
     .limit(limit);
 
-  return ((data ?? []) as unknown as (AcademicEventRow & {
-    course: { id: string; name: string; code: string };
-  })[]).map(({ course, ...event }) => ({ ...event, course }));
+  if (error) return [];
+  return toEvents(data as EventRowWithCourse[] | null);
 }

@@ -12,10 +12,22 @@ import { Card, CardContent } from "@/components/ui/card";
 export const metadata: Metadata = { title: "Calendar" };
 
 export default async function CalendarPage() {
-  const [events, courses] = await Promise.all([
+  const [eventResult, courses] = await Promise.all([
     listEvents(),
     listAllCourses(),
   ]);
+  const events = eventResult.events;
+
+  if (eventResult.error) {
+    return (
+      <div
+        role="alert"
+        className="mx-auto w-full max-w-md rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive"
+      >
+        {eventResult.error}
+      </div>
+    );
+  }
 
   const today = todayIso();
   const upcoming = events.filter(

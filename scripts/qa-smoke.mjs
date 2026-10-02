@@ -92,6 +92,31 @@ async function fetchPage(path) {
   );
 }
 
+// Empty states before any data exists (§25) + auth-page redirect behaviour.
+{
+  const dash = await fetchPage("/dashboard");
+  check(
+    "dashboard shows onboarding when there are no semesters",
+    dash.status === 200 && dash.html.includes("Start tracking your semester")
+  );
+  const gpa = await fetchPage("/gpa");
+  check(
+    "gpa page empty state before any semester exists",
+    gpa.status === 200 && gpa.html.includes("GPA &amp; CGPA")
+  );
+  const auth = await fetch(`${BASE}/auth/login`, {
+    headers: { cookie: cookieHeader },
+    redirect: "manual",
+  });
+  check(
+    "authenticated /auth/login redirects to /dashboard",
+    auth.status >= 300 &&
+      auth.status < 400 &&
+      (auth.headers.get("location") ?? "").includes("/dashboard"),
+    `got ${auth.status} → ${auth.headers.get("location")}`
+  );
+}
+
 const userId = signed.session.user.id;
 const rest = createRestClient(url, anon, {
   global: { headers: { Authorization: `Bearer ${signed.session.access_token}` } },
@@ -330,6 +355,14 @@ async function fetchAnon(path) {
     legacy.status >= 300 && legacy.status < 400 && legacy.location.includes("/auth/login"),
     `got ${legacy.status} → ${legacy.location}`
   );
+  const unknown = await fetchAnon("/definitely-not-a-route");
+  check(
+    "unknown paths stay private (default-deny)",
+    unknown.status >= 300 &&
+      unknown.status < 400 &&
+      unknown.location.includes("/auth/login"),
+    `got ${unknown.status} → ${unknown.location}`
+  );
   const home = await fetchAnon("/");
   check(
     "public home renders marketing chrome",
@@ -473,6 +506,15 @@ async function fetchAnon(path) {
     "calendar shows upcoming with countdown (§20)",
     has(html, "Upcoming", "QA Quiz", "In 3 days", "Quiz")
   );
+  const expectedQuizDate = new Date(`${localPlus(3)}T00:00:00Z`).toLocaleDateString(
+    "en-US",
+    { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" }
+  );
+  check(
+    "event date renders its exact calendar date (no TZ drift)",
+    has(html, expectedQuizDate),
+    `expected "${expectedQuizDate}"`
+  );
   check(
     "calendar shows overdue countdown in earlier section",
     has(html, "Earlier", "QA Overdue HW", "2 days ago")
@@ -542,6 +584,57 @@ async function fetchAnon(path) {
       "85%",
       "QA Smoke"
     )
+  );
+}
+
+// --- Broken links + unknown entities ---------------------------------------
+{
+  const pages = [
+    "/",
+    "/features",
+    "/how-it-works",
+    "/about",
+    "/contact",
+    "/dashboard",
+    `/semesters/${sem.id}`,
+    `/courses/${courseA.id}`,
+    "/gpa",
+    "/calendar",
+  ];
+  const hrefs = new Set();
+  for (const path of pages) {
+    const { html } = await fetchPage(path);
+    for (const m of html.matchAll(/href="(\/[^"]*)"/g)) {
+      const href = m[1].split("#")[0];
+      if (!href || href.startsWith("/_next") || href.includes("?_rsc")) continue;
+      hrefs.add(href);
+    }
+  }
+  const broken = [];
+  for (const href of hrefs) {
+    const res = await fetch(`${BASE}${href}`, {
+      headers: { cookie: cookieHeader },
+      redirect: "manual",
+    });
+    await res.text().catch(() => {});
+    if (res.status >= 400) broken.push(`${href} → ${res.status}`);
+  }
+  check(
+    `no broken links across ${pages.length} pages (${hrefs.size} unique)`,
+    broken.length === 0,
+    broken.join(", ")
+  );
+
+  const missingSem = await fetchPage(
+    "/semesters/11111111-2222-4333-8444-555555555555"
+  );
+  // NOTE: (app)/loading.tsx streams the shell first, so Next commits 200
+  // before notFound() fires — content correctness is what matters here.
+  check(
+    "unknown semester id renders the not-found page",
+    missingSem.html.includes("Page not found") &&
+      !missingSem.html.includes("Start tracking your semester"),
+    `status ${missingSem.status}`
   );
 }
 

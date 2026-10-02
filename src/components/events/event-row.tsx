@@ -1,21 +1,12 @@
-import { Pencil, Trash2 } from "lucide-react";
+import { CircleCheckBig, Pencil, Trash2 } from "lucide-react";
 import { toggleEventCompletion, deleteEvent } from "@/features/events/actions";
 import type { EventWithCourse } from "@/features/events/queries";
+import { formatDate } from "@/lib/format";
 import { CountdownBadge } from "./countdown-badge";
 import { EventFormDialog } from "./event-form-dialog";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { CircleCheckBig } from "lucide-react";
-
-function formatDate(value: string): string {
-  return new Date(`${value}T00:00:00Z`).toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-    timeZone: "UTC",
-  });
-}
 
 /** One calendar row: date, details, countdown/status, actions. */
 export function EventRow({

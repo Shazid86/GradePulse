@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { isValidIsoDate } from "@/lib/dates";
 
 /** Shared validation primitives for all feature schemas. */
 
@@ -8,11 +9,15 @@ export const UUID_PATTERN =
 export const uuidSchema = (label = "id") =>
   z.string().regex(UUID_PATTERN, `Invalid ${label}.`);
 
-/** Strict YYYY-MM-DD date strings (HTML date inputs). */
+/**
+ * Strict YYYY-MM-DD date strings (HTML date inputs).
+ * Round-trip validation rejects impossible dates like 2026-02-31 —
+ * Date.parse() would silently roll those over to March.
+ */
 export const dateStringSchema = z
   .string()
   .regex(/^\d{4}-\d{2}-\d{2}$/, "Use a valid date.")
-  .refine((v) => !Number.isNaN(Date.parse(v)), "Use a valid date.");
+  .refine((v) => isValidIsoDate(v), "Use a valid date.");
 
 /** First zod issue message (server-action friendly). */
 export function firstIssue(error: { issues: { message: string }[] }): string {

@@ -30,6 +30,11 @@ function toUtcMs(dateStr: string): number | null {
   return ms;
 }
 
+/** True for real calendar dates in YYYY-MM-DD form (rejects 2026-02-31). */
+export function isValidIsoDate(dateStr: string): boolean {
+  return toUtcMs(dateStr) !== null;
+}
+
 /** Whole days from `from` (default: today) to `dateStr`. Negative = past. */
 export function daysUntil(
   dateStr: string,
