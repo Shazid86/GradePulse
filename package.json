@@ -10,7 +10,10 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "verify:rls": "node scripts/verify-rls.mjs",
-    "qa:smoke": "node scripts/qa-smoke.mjs"
+    "verify:auth-cookie": "node scripts/verify-auth-cookie.mjs",
+    "qa:smoke": "node scripts/qa-smoke.mjs",
+    "qa:invariants": "node scripts/qa-invariants.mjs",
+    "prebuild": "node scripts/qa-invariants.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
