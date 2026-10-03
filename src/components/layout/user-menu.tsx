@@ -1,7 +1,10 @@
 "use client";
 
-import { LogOut } from "lucide-react";
+import { Globe, LogOut } from "lucide-react";
+import Link from "next/link";
+
 import { signOut } from "@/features/auth/actions";
+import { markExpectSignedIn } from "@/components/layout/expect-signed-in";
 import { Button } from "@/components/ui/button";
 import {
   Avatar,
@@ -39,6 +42,13 @@ export function UserMenu({ email }: { email: string }) {
         <DropdownMenuLabel className="truncate text-xs font-normal text-muted-foreground">
           {email}
         </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link href="/" onClick={markExpectSignedIn}>
+            <Globe aria-hidden="true" />
+            Product site
+          </Link>
+        </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onSelect={() => void signOut()}

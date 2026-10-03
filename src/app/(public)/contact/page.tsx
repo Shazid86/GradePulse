@@ -1,98 +1,125 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { ArrowRight, Mail, User } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+  Briefcase,
+  Camera,
+  GitBranch,
+  Mail,
+  Users,
+} from "lucide-react";
+
+import { Reveal } from "@/components/marketing/motion/reveal";
 
 export const metadata: Metadata = {
-  title: "Contact",
-  description: "Get in touch with the creator of GradePulse.",
+  title: "Contact — GradePulse",
+  description:
+    "Get in touch with the creator of GradePulse. Contact details and social profiles.",
 };
 
-/** Contact placeholders — replace each token with your real details. */
-const CONTACTS = [
-  { label: "Email", value: "[your.email@example.com]" },
-  { label: "Facebook", value: "[facebook.com/your-profile]" },
-  { label: "Instagram", value: "[instagram.com/your-profile]" },
-  { label: "LinkedIn", value: "[linkedin.com/in/your-profile]" },
-  { label: "GitHub", value: "[github.com/your-username]" },
-];
+/**
+ * Placeholder contact rows.
+ *
+ * Replace `value` with the real detail and, where it applies, give the row a
+ * `href` (e.g. "mailto:you@example.com" or a profile URL) to turn it into a
+ * link. Deliberately no form and no backend: there is nothing to store here.
+ */
+const CHANNELS = [
+  {
+    icon: Mail,
+    label: "Email",
+    value: "[your.email@example.com]",
+    href: null,
+  },
+  {
+    icon: Users,
+    label: "Facebook",
+    value: "[your-profile]",
+    href: null,
+  },
+  {
+    icon: Camera,
+    label: "Instagram",
+    value: "[your-profile]",
+    href: null,
+  },
+  {
+    icon: Briefcase,
+    label: "LinkedIn",
+    value: "[your-profile]",
+    href: null,
+  },
+  {
+    icon: GitBranch,
+    label: "GitHub",
+    value: "[your-profile]",
+    href: null,
+  },
+] as const;
 
 export default function ContactPage() {
   return (
-    <div className="mx-auto w-full max-w-3xl px-4 py-14 sm:px-6">
-      <div className="mx-auto max-w-2xl text-center">
-        <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+    <div className="mx-auto w-full max-w-3xl px-4 py-14 sm:px-6 sm:py-20">
+      <Reveal>
+        <p className="text-xs font-medium uppercase tracking-[0.16em] text-primary">
           Contact
-        </h1>
-        <p className="mt-3 text-muted-foreground">
-          Questions, feedback or collaboration — reach out directly.
         </p>
-      </div>
+        <h1 className="mt-3 text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
+          Questions, corrections and feature requests.
+        </h1>
+        <p className="mt-4 text-pretty text-sm leading-relaxed text-muted-foreground sm:text-base">
+          GradePulse is a personal project, so messages reach the person who
+          builds it. The details below are placeholders until they are filled
+          in.
+        </p>
+      </Reveal>
 
-      {/* Prominent placeholders for the creator's real details. */}
-      <Card className="glass mt-8 border-primary/30">
-        <CardHeader className="flex-row items-center gap-4 space-y-0">
-          <div
-            aria-label="Creator photo placeholder"
-            className="flex size-12 shrink-0 items-center justify-center rounded-full border border-border/70 bg-muted text-muted-foreground"
-          >
-            <User className="size-5" aria-hidden="true" />
-          </div>
-          <div>
-            <CardTitle className="text-base font-medium">
-              Shazid — creator of GradePulse
-            </CardTitle>
-            <CardDescription>
-              Replace the placeholders below with your real contact details.
-            </CardDescription>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            {CONTACTS.map((contact) => (
-              <li
-                key={contact.label}
-                className="rounded-lg border border-border/60 bg-background/40 p-3"
+      <ul className="mt-10 space-y-3">
+        {CHANNELS.map((channel, index) => {
+          const body = (
+            <>
+              <span
+                aria-hidden
+                className="flex size-9 shrink-0 items-center justify-center rounded-lg border border-border/70 bg-background/60 text-muted-foreground"
               >
-                <p className="text-xs font-medium text-muted-foreground">
-                  {contact.label}
-                </p>
-                <p className="mt-0.5 break-words font-mono text-sm">
-                  {contact.value}
-                </p>
-              </li>
-            ))}
-          </ul>
-        </CardContent>
-      </Card>
+                <channel.icon className="size-4" />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-sm font-medium">
+                  {channel.label}
+                </span>
+                <span className="gp-figure mt-0.5 block truncate text-sm text-muted-foreground">
+                  {channel.value}
+                </span>
+              </span>
+            </>
+          );
 
-      <Card className="glass mt-4 border-border/70">
-        <CardHeader>
-          <Mail className="mb-1 size-5 text-primary" aria-hidden="true" />
-          <CardTitle className="text-base font-medium">Why contact?</CardTitle>
-          <CardDescription>
-            Found a calculation that looks wrong, or need a feature for your
-            program&rsquo;s grading system? Messages go straight to the
-            creator.
-          </CardDescription>
-        </CardHeader>
-      </Card>
+          return (
+            <li key={channel.label}>
+              <Reveal delay={index * 60}>
+                {channel.href ? (
+                  <a
+                    href={channel.href}
+                    className="gp-glass flex items-center gap-3 rounded-xl p-4 hover:border-primary/40 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                  >
+                    {body}
+                  </a>
+                ) : (
+                  <div className="gp-glass flex items-center gap-3 rounded-xl p-4">
+                    {body}
+                  </div>
+                )}
+              </Reveal>
+            </li>
+          );
+        })}
+      </ul>
 
-      <div className="mt-8 text-center">
-        <Button size="lg" asChild>
-          <Link href="/auth/signup">
-            Get Started
-            <ArrowRight aria-hidden="true" />
-          </Link>
-        </Button>
-      </div>
+      <Reveal delay={320} className="mt-8">
+        <p className="text-xs leading-relaxed text-muted-foreground/80">
+          These entries are intentionally unlinked placeholders. Add an email
+          address or a profile URL to make a row actionable.
+        </p>
+      </Reveal>
     </div>
   );
 }

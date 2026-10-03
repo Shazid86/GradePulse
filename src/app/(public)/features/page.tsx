@@ -1,107 +1,146 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import {
-  ArrowRight,
+  BellRing,
   CalendarDays,
-  ClipboardList,
-  FlaskConical,
-  Gauge,
-  PenLine,
+  GraduationCap,
+  ListChecks,
   Sigma,
   Target,
+  TrendingUp,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+
+import { Reveal } from "@/components/marketing/motion/reveal";
+import { Section } from "@/components/marketing/section";
+import { DemoDataNotice } from "@/components/marketing/visuals/demo-data-notice";
+import { PerformanceOverview } from "@/components/marketing/visuals/performance-overview";
+import { ProductFrame } from "@/components/marketing/visuals/product-frame";
 
 export const metadata: Metadata = {
-  title: "Features",
+  title: "Features — GradePulse",
   description:
-    "Performance tracking, course analytics, the target engine, what-if simulation, GPA/CGPA and the academic calendar.",
+    "Academic performance tracking, course analytics, assessment tracking, a target engine, a what-if simulator, GPA and CGPA, and an academic calendar.",
 };
 
-const FEATURES = [
+const MODULES = [
   {
-    icon: ClipboardList,
+    icon: ListChecks,
     title: "Academic performance tracking",
-    body: "Record class tests, quizzes, assignments, attendance, midterms, finals, labs, presentations, viva and custom assessments. Every course carries its own assessment structure — no university format is hard-coded.",
+    body: "Record class tests, quizzes, assignments, labs, presentations, viva, projects and finals. Every course carries its own assessment structure, so the weighting matches how you are actually graded.",
   },
   {
-    icon: Gauge,
+    icon: TrendingUp,
     title: "Course analytics",
-    body: "Current score, percentage, remaining marks, strongest and weakest categories, course status and a numerical performance trend — all derived from your stored marks.",
+    body: "Weighted totals, category comparisons and a chronological performance trend built from the dates on your records. Strongest and weakest categories are named from the data, not inferred.",
   },
   {
-    icon: PenLine,
+    icon: BellRing,
     title: "Assessment tracking",
-    body: "Each assessment carries marks, a maximum, a date and completion status. Chronological progression shows how your secured marks accumulate over the semester.",
+    body: "Each assessment holds its own marks, maximum, date, notes and completion state. Pending items are visibly distinct from graded ones, and incomplete categories never distort the total.",
   },
   {
     icon: Target,
     title: "Target engine",
-    body: "Choose Pass, a letter from your grading scale, or a custom percentage. GradePulse returns the exact required marks, the required percentage of what remains, and whether the target is achievable, achieved or out of reach.",
-  },
-  {
-    icon: FlaskConical,
-    title: "What-if simulator",
-    body: "Enter hypothetical marks for pending assessments and unassessed categories to see the projected total instantly. Mathematical projection — never a prediction.",
+    body: "Set a pass mark, a letter grade or a custom percentage. GradePulse reports the marks still required, what that represents as a share of the marks that remain, and whether the target is achievable at all.",
   },
   {
     icon: Sigma,
-    title: "GPA & CGPA",
-    body: "Configure your own grading scale with letters, thresholds and grade points. Credit-weighted semester GPA and CGPA across completed semesters follow automatically.",
+    title: "What-if simulator",
+    body: "Try an outcome for the assessments that are still open and see the projected course total. Nothing is written to your records — it is a calculation on top of them.",
+  },
+  {
+    icon: GraduationCap,
+    title: "GPA and CGPA",
+    body: "Define the grading scale each course uses, and GradePulse converts percentages into grade points weighted by credit. Semester GPA covers a term; CGPA rolls up completed semesters.",
   },
   {
     icon: CalendarDays,
     title: "Academic calendar",
-    body: "Upcoming tests, assignments, midterms and finals in one view — with completion states so you always know what is next.",
+    body: "Upcoming tests, assignments and exams with countdowns and completion state, plus a dashboard section showing what is next across the whole semester.",
   },
 ];
 
 export default function FeaturesPage() {
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 py-14 sm:px-6">
-      <div className="mx-auto max-w-2xl text-center">
-        <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-          Features
-        </h1>
-        <p className="mt-3 text-muted-foreground">
-          One system from raw marks to decisions — built around your courses,
-          not someone else&rsquo;s template.
-        </p>
+    <>
+      <div className="mx-auto w-full max-w-6xl px-4 pb-4 pt-14 sm:px-6 sm:pt-20">
+        <Reveal className="max-w-2xl">
+          <p className="text-xs font-medium uppercase tracking-[0.16em] text-primary">
+            Features
+          </p>
+          <h1 className="mt-3 text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
+            Know exactly where you stand.
+          </h1>
+          <p className="mt-4 text-pretty text-sm leading-relaxed text-muted-foreground sm:text-base">
+            GradePulse keeps one structured record of your semester and derives
+            every answer from it. Nothing is estimated, and nothing is stored
+            twice.
+          </p>
+        </Reveal>
       </div>
 
-      <div className="mt-10 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {FEATURES.map((feature) => (
-          <Card key={feature.title} className="glass border-border/70">
-            <CardHeader className="pb-2">
-              <feature.icon
-                className="mb-1 size-5 text-primary"
-                aria-hidden="true"
-              />
-              <CardTitle className="text-base font-medium">
-                {feature.title}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="text-sm text-muted-foreground">
-              {feature.body}
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      {/* Featured block: the dashboard composition, at a larger size. */}
+      <Section className="pb-0 pt-10 sm:pt-12">
+        <Reveal variant="scale">
+          <ProductFrame
+            title="Course overview"
+            meta="Weighted · 100 marks"
+            bodyClassName="p-5 sm:p-7"
+          >
+            <div className="grid gap-7 lg:grid-cols-2 lg:items-center">
+              <PerformanceOverview />
+              <div className="space-y-4">
+                <p className="text-sm font-medium">One view, four answers.</p>
+                <p className="text-sm leading-relaxed text-muted-foreground">
+                  How many marks you have secured, what percentage that
+                  represents, how many marks are still open, and the highest
+                  total you can still reach — calculated from the categories and
+                  weights you configured.
+                </p>
+                <ul className="space-y-2 text-sm text-muted-foreground">
+                  {[
+                    "Weighted by category, not averaged naively.",
+                    "Pending assessments counted as still obtainable.",
+                    "Rounded for display, exact underneath.",
+                  ].map((line) => (
+                    <li key={line} className="flex gap-3">
+                      <span
+                        aria-hidden
+                        className="mt-2 block size-1 shrink-0 rounded-full bg-primary"
+                      />
+                      {line}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </ProductFrame>
+          <DemoDataNotice className="mt-4" />
+        </Reveal>
+      </Section>
 
-      <div className="mt-10 text-center">
-        <Button size="lg" asChild>
-          <Link href="/auth/signup">
-            Get Started
-            <ArrowRight aria-hidden="true" />
-          </Link>
-        </Button>
-      </div>
-    </div>
+      <Section
+        eyebrow="Modules"
+        title="Seven parts, one record."
+        lead="Each module reads the same stored marks, so the answers stay consistent across the application."
+        width="wide"
+        className="border-b-0"
+      >
+        <ul className="grid gap-px overflow-hidden rounded-2xl border border-border/60 bg-border/40 md:grid-cols-2">
+          {MODULES.map((module, index) => (
+            <li key={module.title} className="bg-background/80 backdrop-blur-sm">
+              <Reveal delay={(index % 2) * 70} className="h-full">
+                <div className="flex h-full flex-col p-5 sm:p-6">
+                  <module.icon aria-hidden className="size-4 text-primary" />
+                  <p className="mt-3 text-sm font-medium">{module.title}</p>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                    {module.body}
+                  </p>
+                </div>
+              </Reveal>
+            </li>
+          ))}
+        </ul>
+      </Section>
+    </>
   );
 }

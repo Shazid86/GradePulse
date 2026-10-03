@@ -92,6 +92,64 @@ function scanTokens(src, re, fn) {
   while ((m = rx.exec(src)) !== null) fn(m);
 }
 
+/**
+ * Blanks out comments while preserving every character position (and every
+ * newline), so rules never fire on prose — "no fade, no transition" in a doc
+ * comment is not a violation — and `lineAt()` still maps to the real file.
+ */
+function stripComments(src) {
+  let out = "";
+  let i = 0;
+  let quote = null;
+  while (i < src.length) {
+    const c = src[i];
+    const next = src[i + 1];
+
+    if (quote) {
+      out += c;
+      if (c === "\\") {
+        out += next ?? "";
+        i += 2;
+        continue;
+      }
+      if (c === quote) quote = null;
+      i += 1;
+      continue;
+    }
+
+    if (c === '"' || c === "'" || c === "`") {
+      quote = c;
+      out += c;
+      i += 1;
+      continue;
+    }
+
+    if (c === "/" && next === "/") {
+      while (i < src.length && src[i] !== "\n") {
+        out += " ";
+        i += 1;
+      }
+      continue;
+    }
+
+    if (c === "/" && next === "*") {
+      while (i < src.length && !(src[i] === "*" && src[i + 1] === "/")) {
+        out += src[i] === "\n" ? "\n" : " ";
+        i += 1;
+      }
+      out += "  ";
+      i += 2;
+      continue;
+    }
+
+    out += c;
+    i += 1;
+  }
+  return out;
+}
+
+const read = (p) => stripComments(readFileSync(p, "utf8"));
+
 // --- Rule A: DOM outside effects / handlers --------------------------------
 function ruleA(file, src) {
   if (!/\b(?:window|document)\b/.test(src)) return;
@@ -193,7 +251,7 @@ const CODE = /\.(?:ts|tsx)$/;
 const notTest = (p) => !/\.test\.(?:ts|tsx)$/.test(p);
 
 for (const file of MARKETING.flatMap((d) => walk(d)).filter((p) => CODE.test(p))) {
-  const src = readFileSync(file, "utf8");
+  const src = read(file);
   scanned += 1;
   ruleA(file, src);
   ruleB(file, src);
@@ -201,7 +259,7 @@ for (const file of MARKETING.flatMap((d) => walk(d)).filter((p) => CODE.test(p))
 }
 
 for (const file of APP_SURFACE.flatMap((d) => walk(d)).filter((p) => CODE.test(p) && notTest(p))) {
-  const src = readFileSync(file, "utf8");
+  const src = read(file);
   scanned += 1;
   ruleC(file, src);
   ruleE(file, src);
@@ -211,7 +269,7 @@ for (const file of APP_SURFACE.flatMap((d) => walk(d)).filter((p) => CODE.test(p
 for (const p of [join(ROOT, "src", "app", "globals.css")]) {
   if (existsSync(p)) {
     scanned += 1;
-    ruleB(p, readFileSync(p, "utf8"));
+    ruleB(p, read(p));
   }
 }
 
@@ -223,7 +281,7 @@ for (const relPath of ISLAND_FILES) {
     continue;
   }
   scanned += 1;
-  ruleF(p, readFileSync(p, "utf8"));
+  ruleF(p, read(p));
 }
 
 const RULE_TITLES = {

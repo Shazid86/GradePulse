@@ -52,16 +52,18 @@ GradePulse transforms raw academic records — class tests, quizzes, assignments
 | `npm run start`       | Start production server                  |
 | `npm run lint`        | ESLint                                   |
 | `npm run typecheck`   | TypeScript type checking                 |
-| `npm test`            | Unit tests (engine + validation schemas) |
+| `npm test`            | Unit tests (engine, validation, marketing fixtures) |
 | `npm run verify:rls`  | Live persistence + RLS checks (real DB)  |
-| `npm run qa:smoke`    | Authenticated page smoke (app on :3000)  |
+| `npm run verify:auth-cookie` | Live check that the session cookie stays readable (auth island) |
+| `npm run qa:smoke`    | Page smoke, public + authenticated (app on :3000)  |
+| `npm run qa:invariants` | Build-time public-surface guards (wired to `prebuild`) |
 
 ## Project structure
 
 ```
 src/
   app/
-    (public)/           Marketing site: /, /features, /how-it-works, /about, /contact
+    (public)/           Marketing site: /, /features, /how-it-works, /about, /contact, /calculator
     (app)/              Private app: /dashboard, /semesters, /courses, /gpa, /calendar
     auth/               /auth/login, /auth/signup, /auth/callback
   calculations/         Pure calculation engine + unit tests (no UI, no DB)
@@ -92,11 +94,13 @@ src/
   types/                Database row types
   proxy.ts              Session refresh + route protection (Next.js 16)
                         PUBLIC ALLOWLIST: /, /features, /how-it-works,
-                        /about, /contact, /auth/* — everything else
-                        requires a session (default-deny)
+                        /about, /contact, /calculator, /auth/* —
+                        everything else requires a session (default-deny)
 scripts/
   verify-rls.mjs        Live RLS + persistence verification (throwaway QA users)
-  qa-smoke.mjs          Authenticated page assertions (seeded QA data)
+  verify-auth-cookie.mjs Live session-cookie contract check (name, httpOnly, Path, SameSite)
+  qa-smoke.mjs          Public + authenticated page assertions (seeded QA data)
+  qa-invariants.mjs     Build-time public-surface guards (rules A–F)
 supabase/migrations/    Versioned SQL migrations
 ```
 
@@ -114,6 +118,7 @@ for tabular marks/figures, loaded via `next/font`.
 - ✅ **Phase 5 — Target engine**: target selection (Pass/grading-scale presets/custom), required-score analysis with achieved/achievable/impossible detection, interactive what-if simulator
 - ✅ **Phase 6 — GPA/CGPA**: per-course configurable grading scales, letter grades, credit-weighted semester GPA, CGPA across completed semesters, historical semester performance
 - ✅ **Phase 6.5 — Public site + app boundary**: marketing pages at `/`, `/features`, `/how-it-works`, `/about`, `/contact` (public allowlist in `lib/supabase/proxy.ts` — **default-deny for everything else**), auth at `/auth/login` + `/auth/signup`, dashboard migrated to `/dashboard`; public and authenticated layouts fully separated
+- ✅ **Phase 6.6 — Marketing experience pass**: glass/depth/motion design system in `globals.css` (`gp-glass`, `gp-grid`, `gp-ambient`, reveal/float/drift/fill animations with `prefers-reduced-motion` + `scripting: none` failsafes), motion primitives (`Reveal`, `Float`, `CountUp`, `MetricFill`, `Tilt`), Bloomberg-dense demo visuals driven by one locked fixture (`visuals/demo-data.ts`, engine-verified by unit test), engine-backed public `/calculator`, client-side auth island (SSR renders signed-out; the header swaps Login→Dashboard after hydration from the readable session cookie — **no Supabase import on the public surface**, enforced by `qa:invariants` rule D), nav trimmed to Features/About/Contact with Get Started → `/calculator`, and `qa:smoke` grown to 102 checks covering both anonymous and signed-in public-page behaviour
 - ✅ **Phase 7 — Calendar/events**: academic events per course (CT, Quiz, Assignment, Midterm, Final, Presentation, Viva, Project, or free-text Custom) with date, notes and completion state; `/calendar` page (Upcoming + Earlier & completed), countdown badges (Today / Tomorrow / In N days / N days ago, amber ≤3 days, red overdue, green completed), one-click completion toggle, and the "Upcoming assessments" section on the dashboard. Date math is local-date-only and DST-safe in `lib/dates.ts` (rejects impossible dates)
 - ✅ **Phase 8 — Production QA pass**: shared `lib/format.ts` date rendering (fixes UTC off-by-one west of UTC) replacing four local copies, ISO date validation round-trip (rejects impossible dates like `2026-02-31`), skip-to-content links in both layouts, branded 404, nav active-state simplification, calendar query error state, dead-code cleanup (unused browser client util + separator component), validation schema tests (107 unit tests total) and smoke suite grown to 85 checks
 - ⬜ Notifications — future work

@@ -284,10 +284,39 @@
   }
 }
 
+/* Header hairline: appears as the page scrolls. Implemented as a scroll-driven
+   CSS animation (no JS listener, nothing to hydrate); browsers without
+   support simply keep the hairline visible, which is equally correct. */
+@utility gp-header-hairline {
+  opacity: 1;
+}
+
+@keyframes gp-hairline {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@supports (animation-timeline: scroll()) {
+  .gp-header-hairline {
+    opacity: 0;
+    animation: gp-hairline linear both;
+    animation-timeline: scroll();
+    animation-range: 0 80px;
+  }
+}
+
 /* Reduced motion: no float, no drift, no reveals, no fills — content intact. */
 @media (prefers-reduced-motion: reduce) {
   .gp-float,
   .gp-drift {
+    animation: none !important;
+  }
+  .gp-header-hairline {
+    opacity: 1 !important;
     animation: none !important;
   }
   .gp-reveal,

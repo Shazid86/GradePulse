@@ -1,120 +1,142 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Check } from "lucide-react";
+
+import { Reveal } from "@/components/marketing/motion/reveal";
+import { Section } from "@/components/marketing/section";
+import { DemoDataNotice } from "@/components/marketing/visuals/demo-data-notice";
+import { ProductFrame } from "@/components/marketing/visuals/product-frame";
+import { TargetEnginePanel } from "@/components/marketing/visuals/target-engine-panel";
+import { WorkflowFlow } from "@/components/marketing/visuals/workflow-flow";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 
 export const metadata: Metadata = {
-  title: "How It Works",
+  title: "How it works — GradePulse",
   description:
-    "The GradePulse workflow: create a semester, record marks, analyze, set a target and act.",
+    "Create a semester, add courses, configure assessments, record marks, and let GradePulse calculate where you stand and what you need next.",
 };
 
-const WORKFLOW = [
+const STEPS = [
   {
-    title: "Create semester",
-    body: "Name the term, set its academic year and dates — e.g. Fall 2026.",
+    title: "Create a semester",
+    detail: "A name, an academic year and a date range.",
   },
   {
     title: "Add courses",
-    body: "Credits, total marks and passing marks for each course you are taking.",
+    detail: "Course code, credits, total marks and passing marks.",
   },
   {
     title: "Configure assessments",
-    body: "Define each course's own structure — Attendance 10, Class Tests 20, Midterm 20, Final 40, or anything else.",
+    detail: "Categories and their weight — attendance 10, class tests 20, final 40.",
   },
   {
     title: "Record marks",
-    body: "Enter scores as they happen: obtained marks, maximum, date, completion.",
+    detail: "Each test, assignment and exam with its own maximum and date.",
   },
   {
     title: "Calculate current position",
-    body: "GradePulse computes your secured score, percentage, remaining marks and maximum possible — automatically.",
+    detail: "Weighted totals, percentage and the marks still open.",
   },
   {
-    title: "Analyze performance",
-    body: "Strongest and weakest categories, course status, and a numerical trend from your dated assessments.",
+    title: "Analyse performance",
+    detail: "Category comparison, trend over time, strongest and weakest areas.",
   },
   {
-    title: "Set target",
-    body: "Pass, a letter grade from your scale, or a custom percentage.",
+    title: "Set a target",
+    detail: "A grade, a pass mark, or any custom percentage.",
   },
   {
     title: "Calculate required marks",
-    body: "The exact marks you need — and the percentage of what remains that must be earned.",
+    detail: "Exactly what the remaining assessments have to deliver.",
   },
   {
     title: "Take action",
-    body: "Focus on what moves the number. Record new marks and the cycle continues.",
+    detail: "Study the gap the numbers actually identify.",
   },
 ];
 
 export default function HowItWorksPage() {
   return (
-    <div className="mx-auto w-full max-w-4xl px-4 py-14 sm:px-6">
-      <div className="mx-auto max-w-2xl text-center">
-        <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-          How it works
-        </h1>
-        <p className="mt-3 text-muted-foreground">
-          GradePulse follows a simple loop — data in, understanding out, action
-          forward.
-        </p>
+    <>
+      <div className="mx-auto w-full max-w-6xl px-4 pb-4 pt-14 sm:px-6 sm:pt-20">
+        <Reveal className="max-w-2xl">
+          <p className="text-xs font-medium uppercase tracking-[0.16em] text-primary">
+            How it works
+          </p>
+          <h1 className="mt-3 text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
+            Nine steps, repeated until the semester ends.
+          </h1>
+          <p className="mt-4 text-pretty text-sm leading-relaxed text-muted-foreground sm:text-base">
+            Setting up takes a few minutes. After that, each new mark simply
+            updates the answer.
+          </p>
+        </Reveal>
       </div>
 
-      <ol className="mt-10 space-y-4">
-        {WORKFLOW.map((step, index) => (
-          <li key={step.title}>
-            <Card className="glass border-border/70">
-              <CardHeader className="flex-row items-start gap-4 space-y-0">
-                <Badge
-                  variant="secondary"
-                  className="h-7 shrink-0 font-mono tabular-nums"
-                >
-                  {String(index + 1).padStart(2, "0")}
-                </Badge>
-                <div className="min-w-0">
-                  <CardTitle className="text-base font-medium">
-                    {step.title}
-                  </CardTitle>
-                  <CardDescription className="mt-1">
-                    {step.body}
-                  </CardDescription>
-                </div>
-                {index === WORKFLOW.length - 1 && (
-                  <Check
-                    className="ml-auto hidden size-5 shrink-0 text-primary sm:block"
-                    aria-hidden="true"
-                  />
-                )}
-              </CardHeader>
-            </Card>
-          </li>
-        ))}
-      </ol>
+      <Section className="pt-10 sm:pt-12">
+        <WorkflowFlow />
+      </Section>
 
-      <Card className="glass mt-8 border-primary/30 text-center">
-        <CardHeader>
-          <CardTitle className="text-xl font-semibold tracking-tight">
-            Ready to know where you stand?
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Button size="lg" asChild>
-            <Link href="/auth/signup">
-              Get Started
-              <ArrowRight aria-hidden="true" />
-            </Link>
-          </Button>
-        </CardContent>
-      </Card>
-    </div>
+      <Section
+        eyebrow="The sequence"
+        title="What you actually do, in order."
+        width="wide"
+      >
+        <ol className="relative">
+          {STEPS.map((step, index) => (
+            <li key={step.title} className="relative flex gap-4 pb-8 last:pb-0">
+              {index < STEPS.length - 1 ? (
+                <span
+                  aria-hidden
+                  className="absolute left-[0.9375rem] top-8 h-[calc(100%-1.5rem)] w-px bg-border"
+                />
+              ) : null}
+              <span
+                aria-hidden
+                className="gp-figure relative z-10 mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full border border-border/70 bg-background text-xs font-medium text-muted-foreground"
+              >
+                {String(index + 1).padStart(2, "0")}
+              </span>
+              <Reveal delay={index * 50} className="min-w-0 pt-1">
+                <p className="text-sm font-medium">{step.title}</p>
+                <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                  {step.detail}
+                </p>
+              </Reveal>
+            </li>
+          ))}
+        </ol>
+      </Section>
+
+      <Section
+        eyebrow="Step 8, in detail"
+        title="The answer the whole sequence is building toward."
+        lead="Required marks, expressed both as a number and as a share of everything still open."
+        width="wide"
+        className="border-b-0"
+      >
+        <div className="grid gap-8 lg:grid-cols-2 lg:items-center">
+          <Reveal variant="scale">
+            <ProductFrame title="Target analysis" meta="Database Systems">
+              <TargetEnginePanel />
+            </ProductFrame>
+            <DemoDataNotice className="mt-4" />
+          </Reveal>
+          <Reveal delay={120} className="space-y-5">
+            <p className="text-pretty text-sm leading-relaxed text-muted-foreground sm:text-base">
+              The same figure appears on the course page once a target is set,
+              and it recalculates every time a mark is added or edited.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <Button asChild>
+                <Link href="/calculator">Try the calculator</Link>
+              </Button>
+              <Button variant="outline" asChild>
+                <Link href="/features">See all features</Link>
+              </Button>
+            </div>
+          </Reveal>
+        </div>
+      </Section>
+    </>
   );
 }

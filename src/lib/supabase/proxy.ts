@@ -13,6 +13,7 @@ const PUBLIC_PATHS = new Set([
   "/how-it-works",
   "/about",
   "/contact",
+  "/calculator",
 ]);
 
 /**

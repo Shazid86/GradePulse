@@ -92,6 +92,55 @@ async function fetchPage(path) {
   );
 }
 
+// --- Public marketing surface (anonymous) ---------------------------------
+// The marketing pages must load without a session, must never pull academic
+// data, and must carry the auth-island markers the client swaps after mount.
+{
+  for (const path of [
+    "/",
+    "/features",
+    "/how-it-works",
+    "/about",
+    "/contact",
+    "/calculator",
+  ]) {
+    const res = await fetch(`${BASE}${path}`, { redirect: "manual" });
+    const html =
+      res.status >= 200 && res.status < 300
+        ? (await res.text()).replaceAll("<!-- -->", "")
+        : "";
+    check(
+      `public ${path} loads without a session`,
+      res.status === 200,
+      `got ${res.status}`
+    );
+    if (path === "/" || path === "/calculator") {
+      check(
+        `public ${path} renders the header nav + auth island marker`,
+        html.includes("Get Started") &&
+          html.includes("Dashboard") === false &&
+          html.includes('aria-label="Primary"')
+      );
+    }
+  }
+
+  // Signed-out visitors must not be shown the authenticated CTA label.
+  const home = await fetch(`${BASE}/`, { redirect: "manual" });
+  const homeHtml = (await home.text()).replaceAll("<!-- -->", "");
+  check(
+    "public home offers the signed-out CTA copy",
+    homeHtml.includes("Sign in") || homeHtml.includes("Get Started")
+  );
+  check(
+    "public home exposes the calculator as the primary action",
+    homeHtml.includes('href="/calculator"')
+  );
+  check(
+    "public home keeps /how-it-works reachable but unlinked",
+    !homeHtml.includes('href="/how-it-works"')
+  );
+}
+
 // Empty states before any data exists (§25) + auth-page redirect behaviour.
 {
   const dash = await fetchPage("/dashboard");
@@ -114,6 +163,31 @@ async function fetchPage(path) {
       auth.status < 400 &&
       (auth.headers.get("location") ?? "").includes("/dashboard"),
     `got ${auth.status} → ${auth.headers.get("location")}`
+  );
+}
+
+// --- Public marketing surface (signed in) ---------------------------------
+// A signed-in reader must never be bounced off a public page, must still be
+// able to reach the tool, and the app shell must offer a way back to the site.
+{
+  for (const path of ["/", "/features", "/about", "/contact", "/calculator"]) {
+    const res = await fetch(`${BASE}${path}`, {
+      headers: { cookie: cookieHeader },
+      redirect: "manual",
+    });
+    check(
+      `signed-in ${path} is served (no forced redirect)`,
+      res.status === 200,
+      res.status >= 300 && res.status < 400
+        ? `redirected to ${res.headers.get("location")}`
+        : `got ${res.status}`
+    );
+  }
+
+  const dash = await fetchPage("/dashboard");
+  check(
+    "app shell links back to the public site",
+    dash.html.includes('href="/"') && dash.html.includes("Product site")
   );
 }
 

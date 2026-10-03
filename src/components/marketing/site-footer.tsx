@@ -1,62 +1,77 @@
 import Link from "next/link";
+
 import { Brand } from "@/components/layout/brand";
+
+const PRODUCT_LINKS = [
+  { title: "Features", href: "/features" },
+  { title: "Calculator", href: "/calculator" },
+  { title: "Get Started", href: "/auth/signup" },
+] as const;
+
+const COMPANY_LINKS = [
+  { title: "About", href: "/about" },
+  { title: "Contact", href: "/contact" },
+] as const;
 
 /**
  * Public marketing footer. Contact/social tokens are explicit placeholders —
- * replace them with real details. No database, no forms.
+ * replace them with real details. No database, no forms, no newsletter.
+ *
+ * "/how-it-works" is intentionally unlinked here as well as in the header; the
+ * page itself remains live at its URL.
  */
 export function SiteFooter() {
   return (
-    <footer className="border-t border-border/60 bg-background">
-      <div className="mx-auto grid w-full max-w-6xl grid-cols-2 gap-8 px-4 py-10 sm:px-6 md:grid-cols-4">
+    <footer className="border-t border-border/50 bg-background/60">
+      <div className="mx-auto grid w-full max-w-6xl grid-cols-2 gap-10 px-4 py-14 sm:px-6 md:grid-cols-4">
         <div className="col-span-2 space-y-3 md:col-span-1">
           <Brand />
-          <p className="max-w-xs text-sm text-muted-foreground">
-            GradePulse is a personal academic performance command center —
-            track every mark, understand your progress, know what comes next.
+          <p className="max-w-xs text-sm leading-relaxed text-muted-foreground/90">
+            Track every mark. Understand your progress. Know what comes next.
           </p>
         </div>
 
-        <div className="space-y-2">
-          <p className="text-sm font-semibold">Product</p>
-          <ul className="space-y-1.5 text-sm text-muted-foreground">
-            <li>
-              <Link href="/features" className="hover:text-foreground">
-                Features
-              </Link>
-            </li>
-            <li>
-              <Link href="/how-it-works" className="hover:text-foreground">
-                How It Works
-              </Link>
-            </li>
-            <li>
-              <Link href="/auth/signup" className="hover:text-foreground">
-                Get Started
-              </Link>
-            </li>
+        <div className="space-y-3">
+          <p className="text-xs font-semibold uppercase tracking-wider text-foreground/90">
+            Product
+          </p>
+          <ul className="space-y-2 text-sm text-muted-foreground">
+            {PRODUCT_LINKS.map((item) => (
+              <li key={item.href}>
+                <Link
+                  href={item.href}
+                  className="rounded-sm hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                >
+                  {item.title}
+                </Link>
+              </li>
+            ))}
           </ul>
         </div>
 
-        <div className="space-y-2">
-          <p className="text-sm font-semibold">Company</p>
-          <ul className="space-y-1.5 text-sm text-muted-foreground">
-            <li>
-              <Link href="/about" className="hover:text-foreground">
-                About
-              </Link>
-            </li>
-            <li>
-              <Link href="/contact" className="hover:text-foreground">
-                Contact
-              </Link>
-            </li>
+        <div className="space-y-3">
+          <p className="text-xs font-semibold uppercase tracking-wider text-foreground/90">
+            Company
+          </p>
+          <ul className="space-y-2 text-sm text-muted-foreground">
+            {COMPANY_LINKS.map((item) => (
+              <li key={item.href}>
+                <Link
+                  href={item.href}
+                  className="rounded-sm hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                >
+                  {item.title}
+                </Link>
+              </li>
+            ))}
           </ul>
         </div>
 
-        <div className="space-y-2">
-          <p className="text-sm font-semibold">Contact</p>
-          <ul className="space-y-1.5 text-sm text-muted-foreground">
+        <div className="space-y-3">
+          <p className="text-xs font-semibold uppercase tracking-wider text-foreground/90">
+            Contact
+          </p>
+          <ul className="space-y-2 text-sm text-muted-foreground/90">
             <li>[your.email@example.com]</li>
             <li>Facebook — [your-profile]</li>
             <li>Instagram — [your-profile]</li>
@@ -66,10 +81,15 @@ export function SiteFooter() {
         </div>
       </div>
 
-      <div className="border-t border-border/60">
-        <p className="mx-auto w-full max-w-6xl px-4 py-4 text-xs text-muted-foreground sm:px-6">
-          © {new Date().getFullYear()} GradePulse. All rights reserved.
-        </p>
+      <div className="border-t border-border/40">
+        <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-2 px-4 py-5 sm:px-6">
+          <p className="text-xs text-muted-foreground/80">
+            © {new Date().getFullYear()} GradePulse. All rights reserved.
+          </p>
+          <p className="text-xs text-muted-foreground/60">
+            Built as a personal academic performance command center.
+          </p>
+        </div>
       </div>
     </footer>
   );
