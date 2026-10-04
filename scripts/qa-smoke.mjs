@@ -118,7 +118,10 @@ async function fetchPage(path) {
       check(
         `public ${path} renders the header nav + auth island marker`,
         html.includes("Get Started") &&
-          html.includes("Dashboard") === false &&
+          // The island must SSR the signed-out label; "Login" is that marker.
+          // (A plain `!includes("Dashboard")` would now false-fail: the footer
+          // legitimately links to /dashboard.)
+          html.includes("Login") &&
           html.includes('aria-label="Primary"')
       );
     }
@@ -138,6 +141,24 @@ async function fetchPage(path) {
   check(
     "public home keeps /how-it-works reachable but unlinked",
     !homeHtml.includes('href="/how-it-works"')
+  );
+  // Premium chrome: 4-column footer headers, static copyright, placeholder
+  // socials, and the centered 3-zone header grid.
+  check(
+    "public footer renders the column headers + static copyright",
+    homeHtml.includes(">NAVIGATION<") &&
+      homeHtml.includes(">GRADEPULSE<") &&
+      homeHtml.includes(">CONNECT<") &&
+      homeHtml.includes("© 2026 GradePulse.")
+  );
+  check(
+    "public footer keeps the 5 social icon buttons as href placeholders",
+    (homeHtml.match(/href="#"/g) ?? []).length >= 5
+  );
+  check(
+    "public header uses the centered 3-zone grid",
+    /class="[^"]*justify-self-center[^"]*"/.test(homeHtml) &&
+      /class="[^"]*justify-self-end[^"]*"/.test(homeHtml)
   );
 }
 

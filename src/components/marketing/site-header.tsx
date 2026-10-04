@@ -73,16 +73,16 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-40 bg-background/70 backdrop-blur-xl">
-      <div className="mx-auto flex h-16 w-full max-w-6xl items-center gap-2 px-4 sm:px-6">
+      <div className="mx-auto grid h-16 w-full max-w-6xl grid-cols-[1fr_auto_1fr] items-center px-4 sm:px-6">
         <Link
           href="/"
-          className="rounded-md focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none"
+          className="col-start-1 justify-self-start rounded-md focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none"
           aria-label="GradePulse home"
         >
           <Brand />
         </Link>
 
-        <nav aria-label="Primary" className="ml-3 hidden items-center md:flex">
+        <nav aria-label="Primary" className="col-start-2 hidden items-center justify-self-center md:flex">
           {PUBLIC_NAV.map((item) => (
             <NavLink
               key={item.href}
@@ -93,7 +93,7 @@ export function SiteHeader() {
           ))}
         </nav>
 
-        <div className="ml-auto flex items-center gap-1.5">
+        <div className="col-start-3 flex items-center justify-self-end gap-1.5">
           <span className="hidden sm:inline-flex">
             <AuthNavSlot />
           </span>
