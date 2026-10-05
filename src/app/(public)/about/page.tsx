@@ -2,12 +2,21 @@ import type { Metadata } from "next";
 
 import { Reveal } from "@/components/marketing/motion/reveal";
 import { Section } from "@/components/marketing/section";
+import { CreatorSection } from "@/components/marketing/sections/creator-section";
 
 export const metadata: Metadata = {
   title: "About — GradePulse",
   description:
     "Why GradePulse exists: a personal academic performance command center built by a student who needed the numbers to add up.",
 };
+
+const STORY = [
+  "I built GradePulse because the numbers were never the hard part. Every semester produced the same question at 2 a.m.: with the marks already secured, what is actually needed on what is left?",
+  "The answer had to be trustworthy. A projection that flatters you is worse than no projection at all, so the calculation engine came first — every figure is a calculation on records you entered, never a guess.",
+  "The interface came second, and it stayed small on purpose: one place to record assessments, one place to see targets, one place to watch a GPA roll up.",
+  "It is built and maintained as a personal project, designed to be used daily for the length of a degree rather than for a single exam season.",
+  "Today GradePulse is yours before it is anyone else's — the tools are in place, and the semester you fill next is the first one that counts.",
+] as const;
 
 const PRINCIPLES = [
   {
@@ -22,7 +31,7 @@ const PRINCIPLES = [
     title: "Your records are yours",
     body: "Academic data is private by default, scoped to the signed-in account at the database level, not just in the interface.",
   },
-];
+] as const;
 
 export default function AboutPage() {
   return (
@@ -33,64 +42,29 @@ export default function AboutPage() {
             About
           </p>
           <h1 className="mt-3 text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
-            Built because the numbers were never the hard part.
+            Built from a personal problem.
           </h1>
           <p className="mt-4 text-pretty text-sm leading-relaxed text-muted-foreground sm:text-base">
-            GradePulse is a personal academic performance command center: one
-            place to record every mark, and one place to see what those marks
-            mean — where you stand, what remains, and what the rest of the
-            semester has to deliver.
+            Why GradePulse exists, and what it refuses to guess.
           </p>
         </Reveal>
       </div>
 
-      <Section className="pt-10 sm:pt-12" width="wide">
-        <Reveal variant="scale">
-          <div className="gp-glass-deep overflow-hidden rounded-2xl">
-            <div className="grid gap-0 md:grid-cols-[minmax(0,15rem)_minmax(0,1fr)]">
-              {/*
-                Creator photo placeholder — replace the inner div with an
-                <Image src="/images/creator.jpg" … /> when the photo is ready.
-              */}
-              <div className="relative border-b border-border/60 md:border-b-0 md:border-r">
-                <div
-                  aria-label="Placeholder for the creator's photo"
-                  role="img"
-                  className="flex aspect-square w-full items-center justify-center bg-muted/40 md:aspect-auto md:h-full"
-                >
-                  <span className="gp-figure text-xs uppercase tracking-[0.18em] text-muted-foreground/70">
-                    photo
-                  </span>
-                </div>
-              </div>
+      {/* Creator card — CTA swaps with the session (client island). */}
+      <CreatorSection />
 
-              <div className="space-y-4 p-6 sm:p-8">
-                <div>
-                  <p className="text-lg font-semibold">Shazid</p>
-                  <p className="mt-0.5 text-sm text-primary">
-                    Creator of GradePulse
-                  </p>
-                </div>
-                <p className="text-pretty text-sm leading-relaxed text-muted-foreground">
-                  GradePulse started as a way to answer one question reliably:
-                  with the marks I already have, what do I actually need on what
-                  is left? Answering it well meant building the calculation
-                  engine first and the interface second.
-                </p>
-                <p className="text-pretty text-sm leading-relaxed text-muted-foreground">
-                  It is developed and maintained as a personal project, and it
-                  is designed to be used daily for the length of a degree rather
-                  than for a single exam season.
-                </p>
-              </div>
-            </div>
-          </div>
-        </Reveal>
+      <Section eyebrow="Story" title="Why I built GradePulse." width="wide">
+        <div className="max-w-2xl space-y-4 text-pretty text-sm leading-relaxed text-muted-foreground sm:text-base">
+          {STORY.map((paragraph) => (
+            <p key={paragraph}>{paragraph}</p>
+          ))}
+        </div>
       </Section>
 
       <Section
         eyebrow="Principles"
-        title="Three decisions that shaped the product."
+        title="Awareness before improvement."
+        lead="Three decisions that shaped the product — knowing where you stand comes before moving the number."
         width="wide"
         className="border-b-0"
       >
@@ -115,3 +89,4 @@ export default function AboutPage() {
     </>
   );
 }
+

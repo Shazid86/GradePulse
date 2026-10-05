@@ -32,7 +32,7 @@ export function Section({
   return (
     <section
       id={id}
-      className={cn("border-b border-border/40 py-16 sm:py-20", className)}
+      className={cn("border-b border-border/40 py-16 md:py-24", className)}
     >
       <div
         className={cn(
@@ -47,7 +47,7 @@ export function Section({
             </p>
           ) : null}
           {title ? (
-            <h2 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
+            <h2 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
               {title}
             </h2>
           ) : null}

@@ -19,13 +19,15 @@ import {
 import { cn } from "@/lib/utils";
 
 /**
- * Public navigation. "/how-it-works" is deliberately absent: the page stays
- * live and directly reachable, it is simply no longer in the primary nav.
+ * Public navigation: three anchors that resolve on the homepage from any
+ * public route. Contact moved off the primary nav — it lives in the footer
+ * and as the homepage contact block. "/features" and "/how-it-works" stay
+ * live at their URLs; they are simply not in the primary nav.
  */
 export const PUBLIC_NAV = [
-  { title: "Features", href: "/features" },
-  { title: "About", href: "/about" },
-  { title: "Contact", href: "/contact" },
+  { title: "Features", href: "/#features" },
+  { title: "About", href: "/#about" },
+  { title: "FAQ", href: "/#faq" },
 ] as const;
 
 const GET_STARTED_HREF = "/calculator";
@@ -88,7 +90,7 @@ export function SiteHeader() {
               key={item.href}
               href={item.href}
               title={item.title}
-              active={pathname === item.href}
+              active={!item.href.includes("#") && pathname === item.href}
             />
           ))}
         </nav>
@@ -131,7 +133,7 @@ export function SiteHeader() {
                     key={item.href}
                     href={item.href}
                     title={item.title}
-                    active={pathname === item.href}
+                    active={!item.href.includes("#") && pathname === item.href}
                     onNavigate={() => setOpen(false)}
                     className="py-2.5 text-base"
                   />

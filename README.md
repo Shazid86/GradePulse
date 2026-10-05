@@ -106,8 +106,9 @@ supabase/migrations/    Versioned SQL migrations
 
 ## Typography
 
-Manrope (primary UI typeface — refined geometric sans) paired with Geist Mono
-for tabular marks/figures, loaded via `next/font`.
+Space Grotesk (display headings — geometric, technical) drives all h1–h6 via
+`--font-heading`, paired with Manrope (primary UI typeface — refined geometric
+sans) and Geist Mono for tabular marks/figures, all loaded via `next/font`.
 
 ## Project status
 
@@ -121,6 +122,7 @@ for tabular marks/figures, loaded via `next/font`.
 - ✅ **Phase 6.6 — Marketing experience pass**: glass/depth/motion design system in `globals.css` (`gp-glass`, `gp-grid`, `gp-ambient`, reveal/float/drift/fill animations with `prefers-reduced-motion` + `scripting: none` failsafes), motion primitives (`Reveal`, `Float`, `CountUp`, `MetricFill`, `Tilt`), Bloomberg-dense demo visuals driven by one locked fixture (`visuals/demo-data.ts`, engine-verified by unit test), engine-backed public `/calculator`, client-side auth island (SSR renders signed-out; the header swaps Login→Dashboard after hydration from the readable session cookie — **no Supabase import on the public surface**, enforced by `qa:invariants` rule D), nav trimmed to Features/About/Contact with Get Started → `/calculator`, and `qa:smoke` grown to 102 checks covering both anonymous and signed-in public-page behaviour
 - ✅ **Phase 7 — Calendar/events**: academic events per course (CT, Quiz, Assignment, Midterm, Final, Presentation, Viva, Project, or free-text Custom) with date, notes and completion state; `/calendar` page (Upcoming + Earlier & completed), countdown badges (Today / Tomorrow / In N days / N days ago, amber ≤3 days, red overdue, green completed), one-click completion toggle, and the "Upcoming assessments" section on the dashboard. Date math is local-date-only and DST-safe in `lib/dates.ts` (rejects impossible dates)
 - ✅ **Phase 8 — Production QA pass**: shared `lib/format.ts` date rendering (fixes UTC off-by-one west of UTC) replacing four local copies, ISO date validation round-trip (rejects impossible dates like `2026-02-31`), skip-to-content links in both layouts, branded 404, nav active-state simplification, calendar query error state, dead-code cleanup (unused browser client util + separator component), validation schema tests (107 unit tests total) and smoke suite grown to 85 checks
+- ✅ **Phase 9 — AuReUs marketing restructure**: homepage resequenced nav → hero → features → target engine → what-if → GPA → about → FAQ → contact → closing CTA → footer (new `components/marketing/sections/`), anchor nav (Features/About/FAQ → `/#features`/`/#about`/`/#faq`), Space Grotesk headings (`--font-space-grotesk` → `--font-heading`, global `h1–h6`), new AuReUs-shape copy for hero/footer/about/FAQ/contact, interactive FAQ accordion + what-if demo with `aria-expanded`/`aria-controls` semantics, hero demo card locked to the engine chain (60/100 → 62.5% → 25/40), dead visuals removed (assessment timeline, GPA panel, what-if panel); `qa:smoke` grown to 110 checks
 - ⬜ Notifications — future work
 
 ## Security

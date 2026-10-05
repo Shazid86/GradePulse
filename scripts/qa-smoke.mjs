@@ -160,6 +160,31 @@ async function fetchPage(path) {
     /class="[^"]*justify-self-center[^"]*"/.test(homeHtml) &&
       /class="[^"]*justify-self-end[^"]*"/.test(homeHtml)
   );
+  // AuReUs restructure: anchor nav, FAQ accordion, contact placeholders,
+  // closing CTA and the hero demo card (engine chain from the fixture).
+  check(
+    "public home nav exposes the three homepage anchors",
+    homeHtml.includes('href="/#features"') &&
+      homeHtml.includes('href="/#about"') &&
+      homeHtml.includes('href="/#faq"')
+  );
+  check(
+    "public home FAQ accordion renders with aria-expanded",
+    homeHtml.includes("aria-expanded=")
+  );
+  check(
+    "public home contact block marks every channel Coming soon",
+    (homeHtml.match(/Coming soon/g) ?? []).length >= 6
+  );
+  check(
+    "public home closing CTA points at the calculator",
+    homeHtml.includes("Start tracking your semester") &&
+      homeHtml.includes('href="/calculator"')
+  );
+  check(
+    "public home hero demo card shows the engine chain",
+    homeHtml.includes("60 / 100") && homeHtml.includes("62.5%")
+  );
 }
 
 // Empty states before any data exists (§25) + auth-page redirect behaviour.

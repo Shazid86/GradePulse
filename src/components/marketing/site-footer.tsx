@@ -1,12 +1,12 @@
 import { ArrowUpRight, Briefcase, Camera, GitBranch, Mail, Users } from "lucide-react";
 import Link from "next/link";
 
-import { Brand } from "@/components/layout/brand";
+import { BrandMark } from "@/components/layout/brand";
 
 const NAVIGATION_LINKS = [
-  { title: "Features", href: "/features" },
-  { title: "About", href: "/about" },
-  { title: "Contact", href: "/contact" },
+  { title: "Features", href: "/#features" },
+  { title: "About", href: "/#about" },
+  { title: "FAQ", href: "/#faq" },
 ] as const;
 
 const PRODUCT_LINKS = [
@@ -28,32 +28,37 @@ const SOCIAL_LINKS = [
   { label: "GitHub", href: "#", Icon: GitBranch },
 ] as const;
 
-const TAGLINE =
-  "Track every mark. Understand your progress. Know what comes next.";
-
 /**
  * Public marketing footer — a server component: no state, no effects, no
  * render-time clock (the copyright year is a literal). No database, no forms,
  * no newsletter.
  *
- * "/how-it-works" is intentionally unlinked here as well as in the header; the
- * page itself remains live at its URL.
+ * NAVIGATION mirrors the header anchors (Features/About/FAQ on "/");
+ * "/features", "/how-it-works" and "/contact" stay reachable without being
+ * in either list — Contact through "Get in touch ↗" below.
  */
 export function SiteFooter() {
   return (
     <footer className="border-t border-border/50 bg-background/60">
       <div className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-10 px-4 py-14 sm:px-6 md:grid-cols-4">
         <div className="space-y-4">
-          <Brand />
+          <span className="flex items-center gap-2.5">
+            <BrandMark />
+            <span className="leading-tight">
+              <span className="block text-sm font-semibold tracking-tight">
+                GradePulse
+              </span>
+              <span className="block text-xs text-muted-foreground/80">
+                Academic Performance Tracker
+              </span>
+            </span>
+          </span>
           <p className="max-w-xs text-sm leading-relaxed text-muted-foreground/90">
-            {TAGLINE}
-          </p>
-          <p className="max-w-xs text-sm leading-relaxed text-muted-foreground/70">
-            GradePulse turns your marks, targets and GPA into one clear picture
-            of where you stand — and what to do next.
+            GradePulse helps you understand where your marks actually go —
+            one assessment at a time.
           </p>
           <span className="inline-flex rounded-full border border-border/60 px-3 py-1 text-[11px] font-medium text-primary">
-            Personal Academic Performance Command Center
+            ✨ Built for better academic discipline
           </span>
         </div>
 
@@ -98,7 +103,7 @@ export function SiteFooter() {
             CONNECT
           </p>
           <p className="text-sm leading-relaxed text-muted-foreground/90">
-            Questions, feedback or just a hello — every message is read.
+            Follow the journey and explore the work behind GradePulse.
           </p>
           <div className="flex flex-wrap gap-2">
             {SOCIAL_LINKS.map(({ label, href, Icon }) => (
@@ -106,7 +111,7 @@ export function SiteFooter() {
                 key={label}
                 href={href}
                 aria-label={label}
-                className="inline-flex size-9 items-center justify-center rounded-full border border-border/60 text-muted-foreground hover:border-primary/40 hover:text-primary focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                className="inline-flex size-11 items-center justify-center rounded-full border border-border/60 text-muted-foreground hover:border-primary/40 hover:text-primary focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
               >
                 <Icon aria-hidden className="size-4" />
               </Link>
@@ -124,8 +129,12 @@ export function SiteFooter() {
 
       <div className="border-t border-border/50">
         <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-2 px-4 py-5 sm:px-6">
-          <p className="text-xs text-muted-foreground/80">© 2026 GradePulse.</p>
-          <p className="text-xs text-muted-foreground/60">{TAGLINE}</p>
+          <p className="text-xs text-muted-foreground/80">
+            © 2026 GradePulse. · Built independently by Shazid.
+          </p>
+          <p className="text-xs text-muted-foreground/60">
+            Built with 💚 and discipline.
+          </p>
         </div>
       </div>
     </footer>
