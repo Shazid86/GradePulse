@@ -26,32 +26,31 @@ export function TargetEngineSection() {
       lead="A target is only useful when it resolves to a number you can act on."
       width="wide"
     >
-      <Reveal variant="scale">
-        <div className="gp-glass-deep overflow-hidden rounded-2xl p-6 sm:p-8">
-          <ol className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            {STEPS.map((step, index) => (
-              <li
-                key={step.label}
-                className="flex items-center gap-4 rounded-xl border border-border/60 bg-background/60 p-4 sm:block sm:border-0 sm:bg-transparent sm:p-0"
-              >
+      <ol className="grid grid-cols-1 gap-4 sm:grid-cols-3 md:gap-5">
+        {STEPS.map((step, index) => (
+          <li key={step.label}>
+            <Reveal delay={index * 70} variant="card" className="h-full">
+              <div className="gp-card group h-full rounded-2xl p-5 sm:p-6">
                 <span className="gp-figure block text-3xl font-medium sm:text-4xl">
                   {step.value}
                 </span>
-                <span className="block text-xs uppercase tracking-[0.14em] text-muted-foreground sm:mt-2">
+                <span className="mt-2 block text-xs uppercase tracking-[0.14em] text-muted-foreground">
                   {index < STEPS.length - 1 ? `${step.label} →` : step.label}
                 </span>
-              </li>
-            ))}
-          </ol>
+              </div>
+            </Reveal>
+          </li>
+        ))}
+      </ol>
 
-          <div className="mt-6 flex flex-col gap-4 rounded-xl border border-primary/30 bg-primary/5 p-5 sm:flex-row sm:items-center sm:justify-between">
-            <p className="gp-figure text-lg font-medium sm:text-xl">
-              {DEMO_TARGET.required} / {DEMO_TARGET.remaining} remaining marks
-            </p>
-            <p className="gp-figure text-4xl font-semibold text-primary sm:text-5xl">
-              {DEMO_TARGET.requiredOfRemaining}
-            </p>
-          </div>
+      <Reveal delay={STEPS.length * 70} variant="card">
+        <div className="gp-card gp-card-accent mt-4 flex flex-col gap-4 rounded-2xl p-5 sm:mt-5 sm:flex-row sm:items-center sm:justify-between">
+          <p className="gp-figure text-lg font-medium sm:text-xl">
+            {DEMO_TARGET.required} / {DEMO_TARGET.remaining} remaining marks
+          </p>
+          <p className="gp-figure text-4xl font-semibold text-primary sm:text-5xl">
+            {DEMO_TARGET.requiredOfRemaining}
+          </p>
         </div>
       </Reveal>
     </Section>

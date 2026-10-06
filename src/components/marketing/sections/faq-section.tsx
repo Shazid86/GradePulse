@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, ChevronDown } from "lucide-react";
+import { Check, ChevronDown, Lightbulb } from "lucide-react";
 import { useState } from "react";
 
 import { Reveal } from "@/components/marketing/motion/reveal";
@@ -46,29 +46,46 @@ export function FaqSection() {
   return (
     <Section id="faq" eyebrow="FAQ" width="wide">
       <div className="grid gap-10 lg:grid-cols-2 lg:items-start">
-        <Reveal>
-          <h2 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
-            Simple answers. Better understanding.
-          </h2>
+        <div>
+          <Reveal>
+            <h2 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
+              Simple answers. Better understanding.
+            </h2>
+          </Reveal>
           <ul className="mt-6 space-y-3">
-            {PROMISES.map((promise) => (
-              <li
-                key={promise}
-                className="flex items-start gap-3 text-sm text-muted-foreground"
-              >
-                <Check
-                  aria-hidden
-                  className="mt-0.5 size-4 shrink-0 text-primary"
-                />
-                {promise}
+            {PROMISES.map((promise, index) => (
+              <li key={promise}>
+                <Reveal delay={index * 70} variant="card">
+                  <div className="gp-card group flex items-start gap-3 rounded-xl p-4">
+                    <span
+                      aria-hidden
+                      className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary transition-all duration-200 group-hover:scale-105 group-hover:bg-primary/15"
+                    >
+                      <Check className="size-4" />
+                    </span>
+                    <p className="self-center text-sm text-muted-foreground">
+                      {promise}
+                    </p>
+                  </div>
+                </Reveal>
               </li>
             ))}
           </ul>
-          <p className="mt-6 rounded-xl border border-border/60 bg-muted/40 p-4 text-xs leading-relaxed text-muted-foreground">
-            Tip: try the calculator first — it answers the engine question
-            before you create anything.
-          </p>
-        </Reveal>
+          <Reveal delay={PROMISES.length * 70} variant="card">
+            <div className="gp-card group mt-3 flex items-start gap-3 rounded-xl p-4">
+              <span
+                aria-hidden
+                className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary transition-all duration-200 group-hover:scale-105 group-hover:bg-primary/15"
+              >
+                <Lightbulb className="size-4" />
+              </span>
+              <p className="self-center text-xs leading-relaxed text-muted-foreground">
+                Tip: try the calculator first — it answers the engine question
+                before you create anything.
+              </p>
+            </div>
+          </Reveal>
+        </div>
 
         <Reveal delay={90}>
           <ul className="divide-y divide-border/60 overflow-hidden rounded-2xl border border-border/60 bg-background/60">

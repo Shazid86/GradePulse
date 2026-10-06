@@ -13,7 +13,7 @@ export function ClosingCta() {
       className="border-b-0"
     >
       <Reveal>
-        <div className="flex flex-col items-start gap-5 sm:flex-row sm:items-center sm:justify-between">
+        <div className="gp-card flex flex-col items-start gap-5 rounded-2xl p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
           <p className="text-pretty text-sm leading-relaxed text-muted-foreground sm:text-base">
             Start with one semester. The dashboard fills in from there.
           </p>

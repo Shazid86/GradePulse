@@ -33,18 +33,18 @@ export function ContactSection() {
       lead="Questions, corrections or feature ideas — the details below open up soon."
       width="wide"
     >
-      <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 md:gap-5">
         {CHANNELS.map((channel, index) => (
           <li key={channel.label}>
-            <Reveal delay={(index % 3) * 70} className="h-full">
+            <Reveal delay={index * 70} variant="card" className="h-full">
               <a
                 href="#"
-                className="gp-glass flex h-full items-center gap-3 rounded-xl p-4 transition-colors hover:border-primary/40 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                className="gp-card group flex h-full items-center gap-3 rounded-xl p-4 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
                 aria-label={`${channel.label} — coming soon`}
               >
                 <span
                   aria-hidden
-                  className="flex size-9 shrink-0 items-center justify-center rounded-lg border border-border/70 bg-background/60 text-muted-foreground"
+                  className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary transition-all duration-200 group-hover:scale-105 group-hover:bg-primary/15"
                 >
                   <channel.icon className="size-4" />
                 </span>

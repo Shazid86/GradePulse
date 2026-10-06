@@ -21,19 +21,22 @@ export function Reveal({
   children: ReactNode;
   className?: string;
   delay?: number;
-  variant?: "up" | "scale";
+  variant?: "up" | "scale" | "card";
 }) {
   const { ref, visible } = useReveal<HTMLDivElement>();
+
+  const base =
+    variant === "scale"
+      ? "gp-reveal-scale"
+      : variant === "card"
+        ? "gp-reveal-card"
+        : "gp-reveal";
 
   return (
     <div
       ref={ref}
       style={{ "--gp-delay": `${delay}ms` } as CSSProperties}
-      className={cn(
-        variant === "scale" ? "gp-reveal-scale" : "gp-reveal",
-        visible && "gp-reveal-in",
-        className
-      )}
+      className={cn(base, visible && "gp-reveal-in", className)}
     >
       {children}
     </div>

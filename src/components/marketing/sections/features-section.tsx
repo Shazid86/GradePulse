@@ -56,14 +56,14 @@ export function FeaturesSection() {
       lead="Six modules that all read the same stored records, so every figure on screen agrees with every other."
       width="wide"
     >
-      <ul className="grid gap-px overflow-hidden rounded-2xl border border-border/60 bg-border/40 sm:grid-cols-2 lg:grid-cols-3">
+      <ul className="grid gap-4 sm:grid-cols-2 md:gap-5 lg:grid-cols-3">
         {FEATURES.map((feature, index) => (
-          <li key={feature.title} className="bg-background/80 backdrop-blur-sm">
-            <Reveal delay={(index % 3) * 70} className="h-full">
-              <div className="flex h-full flex-col p-5 sm:p-6">
+          <li key={feature.title}>
+            <Reveal delay={index * 70} variant="card" className="h-full">
+              <div className="gp-card group flex h-full flex-col rounded-2xl p-5 sm:p-6">
                 <span
                   aria-hidden
-                  className="flex size-9 items-center justify-center rounded-lg border border-border/70 bg-background/60 text-primary"
+                  className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary transition-all duration-200 group-hover:scale-105 group-hover:bg-primary/15"
                 >
                   <feature.icon className="size-4" />
                 </span>

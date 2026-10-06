@@ -125,12 +125,17 @@ export default function FeaturesPage() {
         width="wide"
         className="border-b-0"
       >
-        <ul className="grid gap-px overflow-hidden rounded-2xl border border-border/60 bg-border/40 md:grid-cols-2">
+        <ul className="grid gap-4 md:grid-cols-2 md:gap-5">
           {MODULES.map((module, index) => (
-            <li key={module.title} className="bg-background/80 backdrop-blur-sm">
-              <Reveal delay={(index % 2) * 70} className="h-full">
-                <div className="flex h-full flex-col p-5 sm:p-6">
-                  <module.icon aria-hidden className="size-4 text-primary" />
+            <li key={module.title}>
+              <Reveal delay={index * 70} variant="card" className="h-full">
+                <div className="gp-card group flex h-full flex-col rounded-2xl p-5 sm:p-6">
+                  <span
+                    aria-hidden
+                    className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary transition-all duration-200 group-hover:scale-105 group-hover:bg-primary/15"
+                  >
+                    <module.icon className="size-4" />
+                  </span>
                   <p className="mt-3 text-sm font-medium">{module.title}</p>
                   <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                     {module.body}

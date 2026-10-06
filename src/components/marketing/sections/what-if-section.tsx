@@ -30,7 +30,7 @@ export function WhatIfSection() {
       width="wide"
     >
       <Reveal variant="scale">
-        <div className="gp-glass overflow-hidden rounded-2xl p-6 sm:p-8">
+        <div className="gp-card gp-card-no-lift rounded-2xl p-6 sm:p-8">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
               <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">
@@ -79,7 +79,7 @@ export function WhatIfSection() {
                     type="button"
                     onClick={() => setObtained(row.finalObtained)}
                     aria-pressed={active}
-                    className={`gp-figure inline-flex min-h-11 items-center gap-1.5 rounded-lg border px-3 text-sm transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none ${
+                    className={`gp-figure inline-flex min-h-11 items-center gap-1.5 rounded-lg border px-3 text-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/50 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none ${
                       active
                         ? "border-primary/50 bg-primary/10 text-primary"
                         : "border-border/60 bg-background/60 text-muted-foreground hover:text-foreground"

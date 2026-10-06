@@ -226,6 +226,50 @@
   letter-spacing: -0.01em;
 }
 
+/* Floating glass card: independent surface with a visible border and a
+   per-card hover (lift + border/background brighten). Stagger + entrance come
+   from the Reveal wrapper — never this element — so the two transforms can't
+   clobber each other. */
+@utility gp-card {
+  background: var(--gp-glass-fill);
+  border: 1px solid color-mix(in oklab, var(--border) 60%, transparent);
+  box-shadow:
+    inset 0 1px 0 0 color-mix(in oklab, white 70%, transparent),
+    0 1px 2px 0 color-mix(in oklab, #000 5%, transparent),
+    0 4px 14px -4px color-mix(in oklab, #000 8%, transparent);
+  /* Declared on the base so the return from :hover eases too — lift 150ms,
+     border/bg brighten 200ms ease-out. */
+  transition:
+    transform 150ms ease-out,
+    border-color 200ms ease-out,
+    background-color 200ms ease-out;
+}
+
+/* Unlayered on purpose so they win over the base utility without
+   specificity games. */
+.gp-card:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in oklab, var(--primary) 40%, transparent);
+  background-color: color-mix(in oklab, var(--gp-glass-fill) 88%, white);
+}
+
+/* Accent variant (CGPA card, 62.5% callout): primary-tinted surface. */
+.gp-card-accent {
+  background: color-mix(in oklab, var(--primary) 6%, transparent);
+  border-color: color-mix(in oklab, var(--primary) 40%, transparent);
+}
+
+.gp-card-accent:hover {
+  background-color: color-mix(in oklab, var(--primary) 10%, transparent);
+  border-color: color-mix(in oklab, var(--primary) 55%, transparent);
+}
+
+/* No-lift variant: interactive drag surface (what-if slider) — brighten only. */
+.gp-card-no-lift:hover {
+  transform: none;
+}
+
+
 /* ---------------------------------------------------------------------------
  * Motion primitives. Exactly one reveal system, one float, one fill.
  * Everything below is disabled under prefers-reduced-motion.
@@ -257,6 +301,16 @@
 @utility gp-reveal-scale {
   opacity: 0;
   transform: translate3d(0, 1rem, 0) scale(0.98);
+  transition:
+    opacity 620ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 620ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: var(--gp-delay, 0ms);
+}
+
+/* Scroll-reveal: per-card stagger (fade + 12px rise). */
+@utility gp-reveal-card {
+  opacity: 0;
+  transform: translate3d(0, 0.75rem, 0);
   transition:
     opacity 620ms cubic-bezier(0.16, 1, 0.3, 1),
     transform 620ms cubic-bezier(0.16, 1, 0.3, 1);
@@ -332,7 +386,8 @@
     animation: none !important;
   }
   .gp-reveal,
-  .gp-reveal-scale {
+  .gp-reveal-scale,
+  .gp-reveal-card {
     opacity: 1 !important;
     transform: none !important;
     transition: none !important;
@@ -340,12 +395,18 @@
   .gp-fill {
     transition: none !important;
   }
+  .gp-card,
+  .gp-card:hover {
+    transform: none !important;
+    transition: none !important;
+  }
 }
 
 /* JS disabled: nothing may depend on a reveal to be readable. */
 @media (scripting: none) {
   .gp-reveal,
-  .gp-reveal-scale {
+  .gp-reveal-scale,
+  .gp-reveal-card {
     opacity: 1 !important;
     transform: none !important;
   }

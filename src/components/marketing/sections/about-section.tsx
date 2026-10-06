@@ -37,8 +37,8 @@ export function AboutSection() {
           </Link>
         </Reveal>
 
-        <Reveal delay={90} variant="scale">
-          <figure className="gp-glass rounded-2xl p-6 sm:p-7">
+        <Reveal delay={90} variant="card">
+          <figure className="gp-card rounded-2xl p-6 sm:p-7">
             <blockquote className="text-pretty text-sm leading-relaxed text-muted-foreground sm:text-base">
               &ldquo;The numbers were never the hard part. The hard part was
               trusting one answer to a question every student asks at 2 a.m.

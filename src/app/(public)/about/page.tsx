@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Calculator, Lock, Settings2 } from "lucide-react";
 
 import { Reveal } from "@/components/marketing/motion/reveal";
 import { Section } from "@/components/marketing/section";
@@ -20,14 +21,17 @@ const STORY = [
 
 const PRINCIPLES = [
   {
+    icon: Settings2,
     title: "No hard-coded academic rules",
     body: "Assessment structures, weights and grading scales belong to the institution, not the software. GradePulse stores them as data, so any course on any scheme works without a code change.",
   },
   {
+    icon: Calculator,
     title: "Arithmetic, not prediction",
     body: "Every figure is a calculation on records you entered. Projections say what a given outcome would produce — they never claim to know what you will do.",
   },
   {
+    icon: Lock,
     title: "Your records are yours",
     body: "Academic data is private by default, scoped to the signed-in account at the database level, not just in the interface.",
   },
@@ -68,15 +72,18 @@ export default function AboutPage() {
         width="wide"
         className="border-b-0"
       >
-        <ul className="grid gap-px overflow-hidden rounded-2xl border border-border/60 bg-border/40 md:grid-cols-3">
+        <ul className="grid gap-4 md:grid-cols-3 md:gap-5">
           {PRINCIPLES.map((principle, index) => (
-            <li
-              key={principle.title}
-              className="bg-background/80 backdrop-blur-sm"
-            >
-              <Reveal delay={index * 70} className="h-full">
-                <div className="flex h-full flex-col p-5 sm:p-6">
-                  <p className="text-sm font-medium">{principle.title}</p>
+            <li key={principle.title}>
+              <Reveal delay={index * 70} variant="card" className="h-full">
+                <div className="gp-card group flex h-full flex-col rounded-2xl p-5 sm:p-6">
+                  <span
+                    aria-hidden
+                    className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary transition-all duration-200 group-hover:scale-105 group-hover:bg-primary/15"
+                  >
+                    <principle.icon className="size-4" />
+                  </span>
+                  <p className="mt-3 text-sm font-medium">{principle.title}</p>
                   <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                     {principle.body}
                   </p>
